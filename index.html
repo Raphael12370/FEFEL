@@ -125,9 +125,14 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
       </div>
     </div>
     <div class="api-banner" id="api-banner">
-      <span class="api-banner-text">Chave API brapi.dev - gratuita, cotacoes B3 em tempo real. Acesse brapi.dev e cole sua chave aqui:</span>
-      <input class="api-key-input" id="api-key-input" type="text" placeholder="Cole sua chave aqui..."/>
+      <span class="api-banner-text">Chave <strong>brapi.dev</strong> — cotacoes B3 em tempo real (gratuita). Acesse <a href="https://brapi.dev" target="_blank" rel="noopener">brapi.dev</a> e cole sua chave:</span>
+      <input class="api-key-input" id="api-key-input" type="text" placeholder="Cole sua chave brapi aqui..."/>
       <button class="btn btn-gold" onclick="saveApiKey()">Salvar Chave</button>
+    </div>
+    <div class="api-banner" id="claude-banner" style="border-color:#a78bfa44">
+      <span class="api-banner-text">Chave <strong>Claude API</strong> — necessaria para o Jornal de Mercado. Acesse <a href="https://console.anthropic.com" target="_blank" rel="noopener">console.anthropic.com</a> e cole sua chave:</span>
+      <input class="api-key-input" id="claude-key-input" type="password" placeholder="sk-ant-..."/>
+      <button class="btn btn-gold" onclick="saveClaudeKey()">Salvar Chave</button>
     </div>
     <div id="tab-carteira">
       <div class="btn-row">
