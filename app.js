@@ -5,7 +5,7 @@ function loadState(){try{return JSON.parse(localStorage.getItem(SK));}catch{retu
 function saveState(){try{localStorage.setItem(SK,JSON.stringify(state));}catch{}}
 let state=loadState()||{apiKey:'',stocks:[{id:1,ticker:'MBRF3',name:'Marfrig',qty:5100,pm:20.28,price:null,chg:null,target:null},{id:2,ticker:'DIRR3',name:'Direcional',qty:7000,pm:15.77,price:null,chg:null,target:null},{id:3,ticker:'MGLU3',name:'Magaz Luiza',qty:9200,pm:10.28,price:null,chg:null,target:null}]};
 const f2=v=>(+v).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
-const fp=v=>(v>=0?'+':''),(+v).toFixed(2)+'%';
+const fp=v=>(v>=0?'+':'')+((+v).toFixed(2))+'%';
 const $=id=>document.getElementById(id);
 const abs=Math.abs;
 function showToast(msg){const el=$('toast');el.textContent=msg;el.style.display='block';if(toastTimer)clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.style.display='none',3500);}
