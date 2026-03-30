@@ -116,7 +116,7 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
       <div>
         <div class="header-eyebrow">B3 · Bovespa</div>
         <div class="header-name">Painel de Investimentos</div>
-        <div class="header-sub" id="last-update">Configure sua chave brapi.dev para ativar cotacoes</div>
+        <div class="header-sub" id="last-update">Clique em Atualizar Cotacoes para buscar os precos</div>
       </div>
       <div class="tabs">
         <button class="tab active" onclick="switchTab('carteira')">Carteira</button>
@@ -124,16 +124,7 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
         <button class="tab" onclick="switchTab('operacao')">Operacao</button>
       </div>
     </div>
-    <div class="api-banner" id="api-banner">
-      <span class="api-banner-text">Chave <strong>brapi.dev</strong> — cotacoes B3 em tempo real (gratuita). Acesse <a href="https://brapi.dev" target="_blank" rel="noopener">brapi.dev</a> e cole sua chave:</span>
-      <input class="api-key-input" id="api-key-input" type="text" placeholder="Cole sua chave brapi aqui..."/>
-      <button class="btn btn-gold" onclick="saveApiKey()">Salvar Chave</button>
-    </div>
-    <div class="api-banner" id="claude-banner" style="border-color:#a78bfa44">
-      <span class="api-banner-text">Chave <strong>Claude API</strong> — necessaria para o Jornal de Mercado. Acesse <a href="https://console.anthropic.com" target="_blank" rel="noopener">console.anthropic.com</a> e cole sua chave:</span>
-      <input class="api-key-input" id="claude-key-input" type="password" placeholder="sk-ant-..."/>
-      <button class="btn btn-gold" onclick="saveClaudeKey()">Salvar Chave</button>
-    </div>
+
     <div id="tab-carteira">
       <div class="btn-row">
         <button class="btn btn-gold" id="btn-update" onclick="fetchAllPrices()">Atualizar Cotacoes</button>

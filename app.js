@@ -5,8 +5,7 @@ let NID=100,opType='compra',editId=null,toastTimer=null;
 function loadState(){try{return JSON.parse(localStorage.getItem(SK));}catch{return null;}}
 function saveState(){try{localStorage.setItem(SK,JSON.stringify(state));}catch{}}
 
-let state=loadState()||{apiKey:'',claudeKey:'',stocks:[],setupDone:false};
-if(!state.claudeKey)state.claudeKey='';
+let state=loadState()||{stocks:[],setupDone:false};
 
 const f2=v=>(+v).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
 const fp=v=>(v>=0?'+':'')+((+v).toFixed(2))+'%';
@@ -21,14 +20,6 @@ if(!state.setupDone){
 showSetup();
 } else {
 hideSetup();
-if(state.apiKey){
-$('api-key-input').placeholder='✅ Chave brapi salva';
-$('api-banner').style.borderColor='var(--green)';
-}
-if(state.claudeKey){
-$('claude-key-input').placeholder='✅ Chave Claude salva';
-$('claude-banner').style.borderColor='var(--green)';
-}
 renderAll();
 }
 });
@@ -83,27 +74,6 @@ renderAll();
 showToast('Carteira criada! Bem-vindo ao Painel.');
 }
 
-/* ── API KEY brapi.dev ── */
-function saveApiKey(){
-const k=$('api-key-input').value.trim();
-if(!k){showToast('Digite sua chave brapi.dev');return;}
-state.apiKey=k;saveState();
-$('api-key-input').value='';
-$('api-key-input').placeholder='Chave salva!';
-$('api-banner').style.borderColor='var(--green)';
-showToast('Chave brapi salva! Clique em Atualizar Cotacoes.');
-}
-
-/* ── CLAUDE API KEY ── */
-function saveClaudeKey(){
-const k=$('claude-key-input').value.trim();
-if(!k){showToast('Digite sua chave Claude API');return;}
-state.claudeKey=k;saveState();
-$('claude-key-input').value='';
-$('claude-key-input').placeholder='Chave Claude salva!';
-$('claude-banner').style.borderColor='var(--green)';
-showToast('Chave Claude salva! Agora voce pode usar o Jornal.');
-}
 
 /* ── TABS ── */
 function switchTab(name){
@@ -116,7 +86,6 @@ if(name==='operacao')renderOpPositions();
 
 /* ── FETCH PRICES ── */
 async function fetchAllPrices(){
-if(!state.apiKey){showToast('Configure sua chave brapi.dev!');return;}
 const btn=$('btn-update');btn.disabled=true;btn.innerHTML='<span class="spin">⟳</span> Buscando...';
 for(const s of state.stocks)await fetchOne(s);
 btn.disabled=false;btn.textContent='Atualizar Cotacoes';
@@ -126,8 +95,7 @@ saveState();renderAll();
 
 async function fetchOne(stock){
 try{
-const url=`https://brapi.dev/api/quote/${stock.ticker}?token=${state.apiKey}&fundamental=true`;
-const res=await fetch(url);const data=await res.json();
+const res=await fetch(`/api/quotes?ticker=${encodeURIComponent(stock.ticker)}`);const data=await res.json();
 const q=data.results&&data.results[0];
 if(q&&q.regularMarketPrice!=null){
 stock.price=q.regularMarketPrice;
@@ -139,7 +107,6 @@ if(q.shortName&&!stock.nameEdited)stock.name=q.shortName;
 }
 
 async function refreshOne(id){
-if(!state.apiKey){showToast('Configure sua chave!');return;}
 const s=state.stocks.find(x=>x.id===id);if(!s)return;
 await fetchOne(s);saveState();renderAll();showToast(s.ticker+' atualizado!');
 }
@@ -279,37 +246,23 @@ function msg_(ok,txt){return`<div class="msg-box" style="background:${ok?'#06d6a
 
 /* ── JOURNAL ── */
 async function fetchJournal(){
-if(!state.claudeKey){
-showToast('Configure sua chave Claude API primeiro!');
-switchTab('carteira');
-setTimeout(()=>$('claude-key-input').focus(),100);
-return;
-}
 const btn=$('btn-journal');
 btn.disabled=true;
 btn.innerHTML='<span class="spin">&#8635;</span> Gerando...';
 $('journal-date').textContent=new Date().toLocaleDateString('pt-BR',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
 $('journal-content').innerHTML=`<div class="spinning-wrap"><div class="spin" style="font-size:30px">&#8635;</div><div style="color:var(--muted);margin-top:16px;font-size:12px;line-height:2">Buscando noticias e relatorios...<br>Aguarde ~30 segundos.</div></div>`;
-const stocksPrompt=state.stocks.map(s=>`${s.ticker} - ${s.name.toUpperCase()}\nNoticias recentes, resultados financeiros com numeros, recomendacao de analistas e preco-alvo.`).join('\n\n');
 try{
-const res=await fetch('https://api.anthropic.com/v1/messages',{
+const res=await fetch('/api/journal',{
 method:'POST',
-headers:{
-'Content-Type':'application/json',
-'x-api-key':state.claudeKey,
-'anthropic-version':'2023-06-01',
-'anthropic-dangerous-direct-browser-access':'true'
-},
+headers:{'Content-Type':'application/json'},
 body:JSON.stringify({
-model:'claude-sonnet-4-20250514',
-max_tokens:4000,
-tools:[{type:'web_search_20250305',name:'web_search'}],
-messages:[{role:'user',content:`Voce e um analista financeiro senior. Pesquise noticias de hoje e gere um briefing em portugues com estas secoes (use os titulos exatos em maiusculas):\n\nMERCADO HOJE\nResumo do Ibovespa: pontuacao, variacao, destaques do dia.\n\nCENARIO BRASIL\nSELIC, inflacao, cambio, politica fiscal.\n\nCENARIO GLOBAL\nFed, China, commodities, impactos no Brasil.\n\n${stocksPrompt}\n\nData atual: ${new Date().toLocaleDateString('pt-BR')}. Seja especifico com numeros e cite fontes.`}]
+stocks:state.stocks.map(s=>({ticker:s.ticker,name:s.name})),
+date:new Date().toLocaleDateString('pt-BR')
 })
 });
 const data=await res.json();
 if(data.error){
-$('journal-content').innerHTML=`<div class="j-section" style="border-left:3px solid var(--red)"><div class="j-title" style="color:var(--red)">Erro da API</div><p class="j-text">${data.error.message||'Erro desconhecido. Verifique sua chave Claude.'}</p></div>`;
+$('journal-content').innerHTML=`<div class="j-section" style="border-left:3px solid var(--red)"><div class="j-title" style="color:var(--red)">Erro da API</div><p class="j-text">${data.error.message||data.error||'Erro desconhecido.'}</p></div>`;
 }else{
 const text=(data.content||[]).filter(b=>b.type==='text').map(b=>b.text).join('\n').trim();
 if(text&&text.length>100){
