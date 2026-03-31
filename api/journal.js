@@ -1,26 +1,33 @@
+const FORMATO = `
+
+REGRAS DE FORMATACAO (obrigatorio):
+- Escreva em paragrafos corridos, sem bullet points, sem hifens como lista, sem asteriscos.
+- Nao use markdown. Nao use negrito. Nao use "•", "-" ou numeracao como lista.
+- Cada secao comeca com o titulo em maiusculas numa linha propria, seguido de um ou dois paragrafos de texto corrido.
+- Seja objetivo e use numeros reais. Cite a fonte entre parenteses ao final da frase quando relevante.`;
+
 const CONFIGS = {
   global: {
     maxTokens: 3000,
     prompt: ({ date }) => `Voce e um analista geopolitico e economico senior. Data atual: ${date}.
 
-Pesquise as principais noticias geopoliticas e economicas globais que podem afetar o mercado financeiro brasileiro hoje. Organize com os titulos EXATOS abaixo em maiusculas:
+Pesquise as principais noticias geopoliticas e economicas globais que podem afetar o mercado financeiro brasileiro hoje. Use os titulos EXATOS abaixo, cada um em sua propria linha em maiusculas, seguido de um paragrafo de texto corrido:
 
 GEOPOLITICA
-Principais tensoes e eventos geopoliticos globais: guerras, sancoes, eleicoes relevantes, acordos diplomaticos.
+Principais tensoes e eventos geopoliticos globais: guerras, sancoes, eleicoes relevantes, acordos diplomaticos. Escreva em paragrafo corrido.
 
 BANCOS CENTRAIS
-Fed (EUA), BCE (Europa), Banco do Japao: decisoes de juros, comunicados, expectativas do mercado.
+Fed (EUA), BCE (Europa), Banco do Japao: decisoes de juros, comunicados recentes, expectativas do mercado. Escreva em paragrafo corrido.
 
 COMMODITIES
-Petroleo (WTI e Brent), minerio de ferro, soja, milho, cobre. Precos atuais e drivers do dia.
+Petroleo (WTI e Brent com valores em dolares), minerio de ferro, soja, milho, cobre. Precos atuais e principais drivers. Escreva em paragrafo corrido.
 
 CHINA
-Economia chinesa, exportacoes, politica monetaria, relacoes comerciais com EUA e Brasil.
+Economia chinesa, exportacoes, politica monetaria, relacoes comerciais com EUA e Brasil. Escreva em paragrafo corrido.
 
 IMPACTOS NO BRASIL
-Como os fatores globais acima estao afetando o Brasil hoje. Seja especifico com numeros e cotacoes.
-
-Use dados reais, seja objetivo e cite fontes quando possivel.`
+Como os fatores globais acima estao afetando o Brasil hoje, com valores de cambio e outros indicadores. Escreva em paragrafo corrido.
+${FORMATO}`
   },
 
   relatorios: {
@@ -29,11 +36,12 @@ Use dados reais, seja objetivo e cite fontes quando possivel.`
       const list = stocks.map(s => `${s.ticker} (${s.name})`).join(', ');
       return `Voce e um analista fundamentalista senior. Data: ${date}.
 
-Para cada empresa abaixo, pesquise os resultados financeiros dos ULTIMOS 4 TRIMESTRES publicados (earnings releases / ITR / DFP na CVM ou RI da empresa). Para cada trimestre informe: periodo (ex: 1T25), Receita Liquida, EBITDA, Lucro Liquido, e variacao percentual vs mesmo trimestre do ano anterior.
+Para cada empresa abaixo, pesquise os resultados financeiros dos ULTIMOS 4 TRIMESTRES publicados (earnings releases, ITR ou DFP na CVM). Para cada trimestre informe o periodo (ex: 3T25), Receita Liquida, EBITDA, Lucro Liquido e variacao percentual vs mesmo trimestre do ano anterior.
 
 Empresas: ${list}
 
-Use o TICKER de cada empresa como titulo da secao em maiusculas (exatamente como listado acima). Para cada empresa mostre os 4 trimestres em ordem cronologica. Se nao encontrar dados de algum trimestre escreva "Dado nao disponivel".`;
+Use o TICKER de cada empresa como titulo da secao em maiusculas numa linha propria. Abaixo do titulo, descreva os 4 trimestres em texto corrido, trimestre por trimestre em ordem cronologica. Nao use tabelas. Se nao encontrar dados de algum trimestre, escreva isso no texto.
+${FORMATO}`;
     }
   },
 
@@ -43,11 +51,12 @@ Use o TICKER de cada empresa como titulo da secao em maiusculas (exatamente como
       const list = stocks.map(s => `${s.ticker} (${s.name})`).join(', ');
       return `Voce e um analista de noticias financeiras. Data: ${date}.
 
-Para cada empresa abaixo, pesquise noticias das ULTIMAS 24-48 HORAS que possam impactar o preco da acao. Exemplos: mudanca de CEO ou diretoria, novos contratos, investigacoes ou multas, rebaixamento ou elevacao de rating por analistas, fusoes e aquisicoes, resultados surpresa, greves, acidentes, decisoes regulatorias.
+Para cada empresa abaixo, pesquise noticias das ULTIMAS 24-48 HORAS que possam impactar o preco da acao: mudanca de CEO ou diretoria, novos contratos relevantes, investigacoes ou multas, rebaixamento ou elevacao de rating por analistas, fusoes, aquisicoes, resultados surpresa, greves, acidentes, decisoes regulatorias.
 
 Empresas: ${list}
 
-Use o TICKER de cada empresa como titulo da secao em maiusculas (exatamente como listado acima). Se nao houver noticias relevantes para uma empresa, escreva exatamente: "Sem noticias relevantes nas ultimas 24h."`;
+Use o TICKER de cada empresa como titulo da secao em maiusculas numa linha propria. Abaixo do titulo, escreva um paragrafo corrido com as noticias encontradas. Se nao houver noticias relevantes para uma empresa, escreva apenas: "Sem noticias relevantes nas ultimas 24h."
+${FORMATO}`;
     }
   },
 
@@ -55,27 +64,26 @@ Use o TICKER de cada empresa como titulo da secao em maiusculas (exatamente como
     maxTokens: 3000,
     prompt: ({ date }) => `Voce e um economista especializado no mercado brasileiro. Data: ${date}.
 
-Pesquise e resuma os principais eventos macroeconomicos do dia. Organize com os titulos EXATOS abaixo em maiusculas:
+Pesquise e resuma os principais eventos macroeconomicos do dia. Use os titulos EXATOS abaixo, cada um em sua propria linha em maiusculas, seguido de um paragrafo de texto corrido:
 
 IBOVESPA
-Pontuacao atual, variacao do dia, volume financeiro, principais altas e baixas.
+Pontuacao atual, variacao percentual do dia, volume financeiro, principais altas e baixas do dia. Escreva em paragrafo corrido.
 
 SELIC E JUROS
-Situacao atual da SELIC, proxima reuniao do COPOM, expectativas do mercado (Focus/B3).
+Nivel atual da SELIC, data da proxima reuniao do COPOM, expectativas do mercado segundo o Focus ou curva de juros. Escreva em paragrafo corrido.
 
 INFLACAO
-IPCA e IGPM: ultimos dados divulgados, tendencia atual, meta do Banco Central.
+IPCA e IGPM: ultimos dados divulgados com valores percentuais, tendencia atual, comparacao com a meta do Banco Central. Escreva em paragrafo corrido.
 
 CAMBIO
-BRL/USD atual, variacao do dia, principais fatores que estao movendo o cambio.
+BRL/USD com valor atual e variacao percentual, principais fatores que estao movendo o cambio hoje. Escreva em paragrafo corrido.
 
 POLITICA FISCAL
-Gastos publicos, arrecadacao, relacao divida/PIB, declaracoes do Ministerio da Fazenda.
+Gastos publicos, arrecadacao, relacao divida/PIB, declaracoes recentes do Ministerio da Fazenda. Escreva em paragrafo corrido.
 
 DADOS DO DIA
-Indicadores economicos divulgados hoje (PIB, desemprego, producao industrial, balanca comercial, etc). Se nenhum indicador relevante foi divulgado hoje, escreva isso explicitamente.
-
-Use numeros reais e cite fontes quando possivel.`
+Indicadores economicos divulgados hoje: PIB, desemprego, producao industrial, balanca comercial, etc. Se nenhum indicador relevante foi divulgado hoje, escreva isso explicitamente em uma frase.
+${FORMATO}`
   }
 };
 
