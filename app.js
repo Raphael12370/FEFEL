@@ -42,7 +42,8 @@ setupStocks.push({id});
 const div=document.createElement('div');
 div.id='row-'+id;
 div.style.cssText='display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:8px;margin-bottom:8px;align-items:center';
-div.innerHTML=`<input type="text" placeholder="Ticker (ex: PETR4)" oninput="this.value=this.value.toUpperCase()" style="background:#07111f;border:1px solid #1a2840;border-radius:7px;color:#dde;padding:9px 12px;font-family:'IBM Plex Mono',monospace;font-size:12px;outline:none;width:100%"/> <input type="number" step="1" placeholder="Quantidade" style="background:#07111f;border:1px solid #1a2840;border-radius:7px;color:#dde;padding:9px 12px;font-family:'IBM Plex Mono',monospace;font-size:12px;outline:none;width:100%"/> <input type="number" step="0.01" placeholder="Preco Medio R$" style="background:#07111f;border:1px solid #1a2840;border-radius:7px;color:#dde;padding:9px 12px;font-family:'IBM Plex Mono',monospace;font-size:12px;outline:none;width:100%"/> <button onclick="removeSetupRow(${id})" style="background:transparent;border:none;color:#ff6b6b88;font-size:18px;cursor:pointer;padding:4px 8px">x</button>`;
+const inp='background:#000;border:1px solid #38383a;border-radius:10px;color:#fff;padding:11px 14px;font-family:\'IBM Plex Mono\',monospace;font-size:13px;outline:none;width:100%;transition:border-color .15s';
+div.innerHTML=`<input type="text" placeholder="Ticker (ex: PETR4)" oninput="this.value=this.value.toUpperCase()" style="${inp}"/> <input type="number" step="1" placeholder="Quantidade" style="${inp}"/> <input type="number" step="0.01" placeholder="Preco Medio R$" style="${inp}"/> <button onclick="removeSetupRow(${id})" style="background:transparent;border:none;color:#ff453a88;font-size:20px;cursor:pointer;padding:4px 10px;line-height:1">×</button>`;
 $('setup-rows').appendChild(div);
 }
 

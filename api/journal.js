@@ -31,16 +31,28 @@ ${FORMATO}`
   },
 
   relatorios: {
-    maxTokens: 6000,
+    maxTokens: 7000,
     prompt: ({ stocks, date }) => {
       const list = stocks.map(s => `${s.ticker} (${s.name})`).join(', ');
       return `Voce e um analista fundamentalista senior. Data: ${date}.
 
-Para cada empresa abaixo, pesquise os resultados financeiros dos ULTIMOS 4 TRIMESTRES publicados (earnings releases, ITR ou DFP na CVM). Para cada trimestre informe o periodo (ex: 3T25), Receita Liquida, EBITDA, Lucro Liquido e variacao percentual vs mesmo trimestre do ano anterior.
+Para cada empresa abaixo, pesquise os resultados financeiros dos ULTIMOS 4 TRIMESTRES publicados (earnings releases, ITR ou DFP na CVM ou Relacoes com Investidores). Para cada trimestre informe TODOS os itens abaixo com os valores em reais e as variacoes percentuais vs mesmo periodo do ano anterior:
+
+- Periodo (ex: 3T25)
+- Receita Bruta
+- Receita Liquida e variacao YoY
+- Lucro Bruto e Margem Bruta
+- EBITDA, Margem EBITDA e variacao YoY
+- EBIT e Margem EBIT
+- Lucro Liquido, Margem Liquida e variacao YoY
+- Divida Liquida e alavancagem (Divida Liquida / EBITDA)
+- Fluxo de Caixa Operacional (FCO)
+- ROE (Retorno sobre Patrimonio)
+- Dividend Yield do periodo, se houver
 
 Empresas: ${list}
 
-Use o TICKER de cada empresa como titulo da secao em maiusculas numa linha propria. Abaixo do titulo, descreva os 4 trimestres em texto corrido, trimestre por trimestre em ordem cronologica. Nao use tabelas. Se nao encontrar dados de algum trimestre, escreva isso no texto.
+Use o TICKER de cada empresa como titulo da secao em maiusculas numa linha propria. Para cada empresa apresente os 4 trimestres em ordem cronologica do mais antigo ao mais recente. Escreva em paragrafos corridos por trimestre. Se nao encontrar algum dado especifico, indique "nao divulgado". Se nao encontrar dados de um trimestre inteiro, escreva isso no texto.
 ${FORMATO}`;
     }
   },

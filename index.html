@@ -3,122 +3,175 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<meta name="theme-color" content="#07111f"/>
+<meta name="theme-color" content="#000000"/>
 <title>Painel de Investimentos</title>
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600;700&family=Sora:wght@400;600;700;800&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600;700&family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{--bg:#07111f;--bg2:#0c1929;--bg3:#0e1e2e;--border:#1a2840;--gold:#f0b429;--green:#06d6a0;--red:#ff6b6b;--text:#cdd6e0;--muted:#556070}
-body{background:var(--bg);color:var(--text);font-family:'Sora',sans-serif;font-size:13px;min-height:100vh}
-::-webkit-scrollbar{width:5px;height:5px}
-::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
-#setup-screen{position:fixed;inset:0;background:var(--bg);z-index:500;display:flex;align-items:center;justify-content:center;padding:20px}
-.setup-box{background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:30px 24px;width:100%;max-width:600px}
-.setup-logo{font-size:10px;color:var(--gold);letter-spacing:5px;text-transform:uppercase;margin-bottom:6px}
-.setup-title{font-family:'IBM Plex Mono',monospace;font-size:22px;font-weight:700;color:#fff;margin-bottom:6px}
-.setup-sub{font-size:12px;color:var(--muted);margin-bottom:24px;line-height:1.7}
-.setup-section-title{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:2px;margin-bottom:10px}
+:root{
+--bg:#000000;
+--bg2:#1c1c1e;
+--bg3:#2c2c2e;
+--border:#38383a;
+--gold:#ff9f0a;
+--green:#30d158;
+--red:#ff453a;
+--blue:#0a84ff;
+--purple:#bf5af2;
+--cyan:#5ac8fa;
+--text:#ffffff;
+--text2:#ebebf599;
+--muted:#8e8e93;
+--muted2:#48484a;
+}
+body{background:var(--bg);color:var(--text);font-family:'Inter',-apple-system,BlinkMacSystemFont,system-ui,sans-serif;font-size:15px;min-height:100vh;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
+
+/* ── SETUP ── */
+#setup-screen{position:fixed;inset:0;background:var(--bg);z-index:500;display:flex;align-items:center;justify-content:center;padding:24px}
+.setup-box{background:var(--bg2);border:1px solid var(--border);border-radius:24px;padding:40px 36px;width:100%;max-width:580px}
+.setup-logo{font-size:11px;color:var(--gold);letter-spacing:5px;text-transform:uppercase;margin-bottom:10px;font-weight:700}
+.setup-title{font-size:30px;font-weight:800;color:#fff;margin-bottom:8px;letter-spacing:-0.8px;line-height:1.1}
+.setup-sub{font-size:14px;color:var(--muted);margin-bottom:32px;line-height:1.7}
+.setup-section-title{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:2px;margin-bottom:14px;font-weight:600}
 #setup-rows{margin-bottom:10px}
-.setup-add-btn{background:transparent;border:1px dashed var(--border);border-radius:7px;color:var(--muted);padding:9px;width:100%;font-family:'Sora',sans-serif;font-size:12px;cursor:pointer;margin-bottom:20px;transition:all .2s}
-.setup-hint{font-size:10px;color:var(--muted);line-height:1.7;margin-bottom:20px;padding:12px 14px;background:var(--bg);border-radius:8px;border:1px solid var(--border)}
-.app{max-width:1100px;margin:0 auto;padding:20px 14px 80px}
-.header{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:22px}
-.header-eyebrow{font-size:9px;color:var(--gold);letter-spacing:5px;text-transform:uppercase;margin-bottom:3px}
-.header-name{font-family:'IBM Plex Mono',monospace;font-size:22px;font-weight:700;color:#fff}
-.header-sub{font-size:10px;color:var(--muted);margin-top:3px;min-height:14px}
-.api-banner{background:#1a2840;border:1px solid var(--gold);border-radius:10px;padding:14px 18px;margin-bottom:18px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
-.api-banner-text{font-size:12px;color:var(--text);flex:1;min-width:180px;line-height:1.7}
-.api-banner-text a{color:var(--gold)}
-.api-key-input{background:var(--bg);border:1px solid var(--border);border-radius:7px;color:#fff;padding:8px 12px;font-family:'IBM Plex Mono',monospace;font-size:12px;width:240px;outline:none}
-.api-key-input:focus{border-color:var(--gold)}
-.tabs{display:flex;gap:4px;background:var(--bg2);border-radius:10px;padding:5px}
-.tab{border:none;border-radius:7px;padding:8px 14px;font-family:'Sora',sans-serif;font-size:12px;font-weight:600;cursor:pointer;color:var(--muted);background:transparent;transition:all .2s;white-space:nowrap}
-.tab.active{background:var(--gold);color:#07111f}
-.j-subtabs{display:flex;gap:4px;background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:5px;margin-bottom:16px;overflow-x:auto}
-.j-subtab{border:none;border-radius:7px;padding:8px 16px;font-family:'Sora',sans-serif;font-size:11px;font-weight:600;cursor:pointer;color:var(--muted);background:transparent;transition:all .2s;white-space:nowrap;flex:1;text-align:center}
-.j-subtab.active{color:#fff;font-weight:700}
-.j-subtab[data-tab="global"].active{background:#f0b42922;border:1px solid #f0b42955;color:#f0b429}
-.j-subtab[data-tab="relatorios"].active{background:#00d4ff22;border:1px solid #00d4ff55;color:#00d4ff}
-.j-subtab[data-tab="empresas"].active{background:#06d6a022;border:1px solid #06d6a055;color:#06d6a0}
-.j-subtab[data-tab="macro"].active{background:#a78bfa22;border:1px solid #a78bfa55;color:#a78bfa}
-.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(155px,1fr));gap:10px;margin-bottom:16px}
-.card{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:14px 16px}
-.card-label{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:7px}
-.card-value{font-family:'IBM Plex Mono',monospace;font-size:16px;font-weight:700}
-.table-wrap{background:var(--bg2);border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:16px}
-.table-head{padding:12px 18px 8px;font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:2px;border-bottom:1px solid var(--border)}
-.tbl{width:100%;border-collapse:collapse;font-family:'IBM Plex Mono',monospace;font-size:11px}
-.tbl th{padding:9px 13px;text-align:right;color:#2a3a50;font-weight:400;font-size:9px;letter-spacing:1px;text-transform:uppercase;white-space:nowrap;background:#08131f}
+.setup-add-btn{background:transparent;border:1.5px dashed var(--border);border-radius:12px;color:var(--muted);padding:12px;width:100%;font-family:'Inter',system-ui,sans-serif;font-size:13px;cursor:pointer;margin-bottom:24px;transition:all .2s}
+.setup-add-btn:hover{border-color:var(--gold);color:var(--gold)}
+.setup-hint{font-size:12px;color:var(--muted);line-height:1.8;margin-bottom:24px;padding:14px 18px;background:var(--bg);border-radius:12px;border:1px solid var(--border)}
+
+/* ── APP ── */
+.app{max-width:1160px;margin:0 auto;padding:32px 24px 100px}
+
+/* ── HEADER ── */
+.header{display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:16px;margin-bottom:32px;padding-bottom:28px;border-bottom:1px solid var(--border)}
+.header-eyebrow{font-size:11px;color:var(--gold);letter-spacing:5px;text-transform:uppercase;margin-bottom:6px;font-weight:700}
+.header-name{font-size:32px;font-weight:900;color:#fff;letter-spacing:-1px;line-height:1.05}
+.header-sub{font-size:13px;color:var(--muted);margin-top:7px;min-height:16px}
+
+/* ── TABS ── */
+.tabs{display:flex;gap:3px;background:var(--bg2);border-radius:14px;padding:4px;border:1px solid var(--border)}
+.tab{border:none;border-radius:10px;padding:10px 22px;font-family:'Inter',system-ui,sans-serif;font-size:13px;font-weight:600;cursor:pointer;color:var(--muted);background:transparent;transition:all .2s;white-space:nowrap}
+.tab.active{background:var(--gold);color:#000}
+.tab:not(.active):hover{color:var(--text)}
+
+/* ── CARDS ── */
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:14px;margin-bottom:20px}
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:20px;padding:24px;position:relative;overflow:hidden;transition:border-color .2s}
+.card:hover{border-color:var(--muted2)}
+.card-accent{position:absolute;top:0;left:0;right:0;height:3px;border-radius:20px 20px 0 0}
+.card-label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:2px;margin-bottom:12px;font-weight:600}
+.card-value{font-family:'IBM Plex Mono',monospace;font-size:24px;font-weight:700;letter-spacing:-0.5px;line-height:1}
+
+/* ── PIE ── */
+.pie-wrap{background:var(--bg2);border:1px solid var(--border);border-radius:20px;padding:26px;margin-bottom:20px}
+.pie-section-title{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:2px;margin-bottom:20px;font-weight:600}
+.pie-inner{display:flex;gap:40px;align-items:center;flex-wrap:wrap}
+.pie-legend{display:flex;flex-direction:column;gap:14px}
+.pie-leg{display:flex;align-items:center;gap:12px;font-family:'IBM Plex Mono',monospace;font-size:13px}
+.pie-dot{width:10px;height:10px;border-radius:3px;flex-shrink:0}
+
+/* ── TABLE ── */
+.table-wrap{background:var(--bg2);border:1px solid var(--border);border-radius:20px;overflow:hidden;margin-bottom:20px}
+.table-head{padding:18px 24px 14px;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:2px;border-bottom:1px solid var(--border);font-weight:600}
+.tbl{width:100%;border-collapse:collapse;font-family:'IBM Plex Mono',monospace;font-size:12px}
+.tbl th{padding:11px 16px;text-align:right;color:var(--muted2);font-weight:500;font-size:10px;letter-spacing:1px;text-transform:uppercase;white-space:nowrap;background:#0a0a0a}
 .tbl th:first-child{text-align:left}
-.tbl td{padding:12px 13px;text-align:right;border-bottom:1px solid #0e1d2c;vertical-align:middle}
+.tbl td{padding:18px 16px;text-align:right;border-bottom:1px solid #1c1c1e;vertical-align:middle}
 .tbl td:first-child{text-align:left}
 .tbl tr:last-child td{border-bottom:none}
-.tbl tbody tr:hover td{background:#0f1e30}
-.btn{border:none;border-radius:7px;padding:9px 18px;font-family:'Sora',sans-serif;font-size:12px;font-weight:700;cursor:pointer;transition:opacity .15s}
-.btn:disabled{opacity:.45;cursor:not-allowed}
+.tbl tbody tr:hover td{background:#1c1c1e88}
+
+/* ── BUTTONS ── */
+.btn{border:none;border-radius:12px;padding:12px 24px;font-family:'Inter',system-ui,sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:all .15s;letter-spacing:-0.1px}
+.btn:disabled{opacity:.4;cursor:not-allowed}
 .btn:hover:not(:disabled){opacity:.85}
-.btn-gold{background:var(--gold);color:#07111f}
-.btn-outline{background:var(--bg2);color:var(--gold);border:1px solid #f0b42944}
-.btn-ghost{background:transparent;color:var(--muted);border:1px solid var(--border)}
-.btn-green{background:var(--green);color:#07111f}
-.btn-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;align-items:center}
-.pie-wrap{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:18px;margin-bottom:16px}
-.pie-inner{display:flex;gap:24px;align-items:center;flex-wrap:wrap}
-.pie-legend{display:flex;flex-direction:column;gap:10px}
-.pie-leg{display:flex;align-items:center;gap:9px;font-family:'IBM Plex Mono',monospace;font-size:12px}
-.pie-dot{width:10px;height:10px;border-radius:2px;flex-shrink:0}
-.j-section{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:18px;margin-bottom:12px}
-.j-title{font-size:10px;letter-spacing:2px;text-transform:uppercase;font-weight:700;margin-bottom:12px}
-.j-text{color:#aab;font-size:12px;line-height:1.9;white-space:pre-line}
-.j-company{background:var(--bg2);border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:12px}
-.j-company-head{background:var(--bg3);padding:12px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px}
-.j-chip{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:10px;flex-shrink:0}
-.j-company-body{padding:14px 16px}
-.op-form{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:20px;max-width:460px;margin-bottom:14px}
-.field{display:flex;flex-direction:column;gap:5px;margin-bottom:13px}
-.field label{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px}
-.field input{background:var(--bg);border:1px solid var(--border);border-radius:7px;color:var(--text);padding:9px 12px;font-family:'IBM Plex Mono',monospace;font-size:13px;outline:none;width:100%}
+.btn-gold{background:var(--gold);color:#000}
+.btn-outline{background:transparent;color:var(--gold);border:1px solid #ff9f0a44}
+.btn-ghost{background:var(--bg3);color:var(--muted);border:1px solid var(--border)}
+.btn-green{background:var(--green);color:#000}
+.btn-row{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:20px;align-items:center}
+
+/* ── JOURNAL ── */
+.j-subtabs{display:flex;gap:4px;background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:4px;margin-bottom:22px;overflow-x:auto}
+.j-subtab{border:none;border-radius:10px;padding:10px 16px;font-family:'Inter',system-ui,sans-serif;font-size:12px;font-weight:600;cursor:pointer;color:var(--muted);background:transparent;transition:all .2s;white-space:nowrap;flex:1;text-align:center}
+.j-subtab:not(.active):hover{color:var(--text)}
+.j-subtab.active{font-weight:700}
+.j-subtab[data-tab="global"].active{background:#ff9f0a18;border:1px solid #ff9f0a44;color:#ff9f0a}
+.j-subtab[data-tab="relatorios"].active{background:#0a84ff18;border:1px solid #0a84ff44;color:#0a84ff}
+.j-subtab[data-tab="empresas"].active{background:#30d15818;border:1px solid #30d15844;color:#30d158}
+.j-subtab[data-tab="macro"].active{background:#bf5af218;border:1px solid #bf5af244;color:#bf5af2}
+
+.j-section{background:var(--bg2);border:1px solid var(--border);border-radius:20px;padding:28px;margin-bottom:16px}
+.j-section-accent{width:32px;height:3px;border-radius:2px;margin-bottom:20px}
+.j-title{font-size:11px;letter-spacing:2px;text-transform:uppercase;font-weight:700;margin-bottom:18px;font-family:'Inter',system-ui,sans-serif}
+.j-text{color:rgba(235,235,245,.75);font-size:15px;line-height:1.9;white-space:pre-line;font-family:'Inter',system-ui,sans-serif;font-weight:400}
+.j-company{background:var(--bg2);border:1px solid var(--border);border-radius:20px;overflow:hidden;margin-bottom:16px}
+.j-company-head{background:var(--bg3);padding:18px 24px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:16px}
+.j-chip{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:10px;flex-shrink:0}
+.j-company-body{padding:24px}
+
+/* ── OPERATIONS ── */
+.op-form{background:var(--bg2);border:1px solid var(--border);border-radius:20px;padding:28px;max-width:480px;margin-bottom:18px}
+.field{display:flex;flex-direction:column;gap:7px;margin-bottom:18px}
+.field label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:2px;font-weight:600}
+.field input{background:var(--bg);border:1px solid var(--border);border-radius:12px;color:var(--text);padding:13px 16px;font-family:'IBM Plex Mono',monospace;font-size:14px;outline:none;width:100%;transition:border-color .15s}
 .field input:focus{border-color:var(--gold)}
-.toggle-row{display:flex;gap:8px;margin-bottom:18px}
-.tog-btn{flex:1;border:none;border-radius:7px;padding:9px;font-family:'Sora',sans-serif;font-size:12px;font-weight:700;cursor:pointer;transition:all .2s}
-.chips{display:flex;gap:5px;flex-wrap:wrap;margin-top:7px}
-.chip{border:none;border-radius:5px;padding:3px 10px;font-size:10px;font-family:'IBM Plex Mono',monospace;cursor:pointer;font-weight:700}
-.preview-box{background:var(--bg);border:1px solid var(--border);border-radius:7px;padding:12px 14px;margin-bottom:13px;font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted);line-height:1.9}
-.msg-box{border-radius:7px;padding:11px 14px;font-size:11px;line-height:1.8;margin-top:13px;font-family:'IBM Plex Mono',monospace}
-.overlay{position:fixed;inset:0;background:rgba(0,0,0,.85);display:flex;align-items:center;justify-content:center;z-index:300;padding:16px}
-.modal{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:24px;width:100%;max-width:360px}
-.modal-title{font-size:14px;font-weight:700;color:var(--gold);margin-bottom:18px}
-.modal-btns{display:flex;gap:9px;margin-top:18px}
-.icon-btn{background:transparent;border:none;cursor:pointer;padding:3px 7px;font-size:13px;border-radius:5px}
+.toggle-row{display:flex;gap:10px;margin-bottom:22px}
+.tog-btn{flex:1;border:none;border-radius:12px;padding:12px;font-family:'Inter',system-ui,sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:all .2s}
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.chip{border:none;border-radius:7px;padding:5px 12px;font-size:11px;font-family:'IBM Plex Mono',monospace;cursor:pointer;font-weight:700}
+.preview-box{background:var(--bg);border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin-bottom:14px;font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--muted);line-height:2}
+.msg-box{border-radius:12px;padding:14px 16px;font-size:13px;line-height:1.8;margin-top:14px;font-family:'IBM Plex Mono',monospace}
+
+/* ── MODAL ── */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);display:flex;align-items:center;justify-content:center;z-index:300;padding:20px;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
+.modal{background:var(--bg2);border:1px solid var(--border);border-radius:24px;padding:32px;width:100%;max-width:400px}
+.modal-title{font-size:20px;font-weight:800;color:var(--gold);margin-bottom:24px;letter-spacing:-0.4px}
+.modal-btns{display:flex;gap:10px;margin-top:24px}
+.icon-btn{background:transparent;border:none;cursor:pointer;padding:4px 8px;font-size:14px;border-radius:7px;transition:background .15s}
 .icon-btn:hover{background:var(--border)}
+
+/* ── MISC ── */
 @keyframes spin{to{transform:rotate(360deg)}}
 .spin{animation:spin .7s linear infinite;display:inline-block}
-.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#172031;border:1px solid #f0b42944;border-radius:8px;padding:10px 18px;font-size:11px;color:var(--text);font-family:'IBM Plex Mono',monospace;z-index:400;white-space:nowrap;pointer-events:none;animation:fadeUp .3s ease}
-@keyframes fadeUp{from{opacity:0;transform:translateX(-50%) translateY(8px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
+.toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%);background:rgba(28,28,30,.95);border:1px solid var(--border);border-radius:14px;padding:13px 22px;font-size:13px;color:var(--text);z-index:400;white-space:nowrap;pointer-events:none;animation:fadeUp .3s ease;box-shadow:0 8px 40px rgba(0,0,0,.6);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px)}
+@keyframes fadeUp{from{opacity:0;transform:translateX(-50%) translateY(10px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
 .green{color:var(--green)}.red{color:var(--red)}.gold{color:var(--gold)}.muted{color:var(--muted)}.bold{font-weight:700}
-.empty-state{text-align:center;padding:60px;color:var(--muted);line-height:2}
-.spinning-wrap{text-align:center;padding:60px}
+.empty-state{text-align:center;padding:80px 40px;color:var(--muted);line-height:2.2;font-size:14px}
+.spinning-wrap{text-align:center;padding:80px 40px}
 input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
-.reset-btn{font-size:10px;color:var(--muted);background:transparent;border:none;cursor:pointer;text-decoration:underline;margin-left:8px}
+.reset-btn{font-size:12px;color:var(--muted);background:transparent;border:none;cursor:pointer;text-underline-offset:3px;text-decoration:underline}
 .reset-btn:hover{color:var(--red)}
-@media(max-width:600px){.tabs{width:100%}.tab{flex:1;text-align:center;font-size:11px;padding:7px 8px}.api-key-input{width:100%}.header-name{font-size:18px}.setup-title{font-size:18px}}
+@media(max-width:640px){
+.tabs{width:100%}.tab{flex:1;text-align:center;font-size:12px;padding:9px 8px}
+.header-name{font-size:26px}.setup-title{font-size:24px}
+.cards{grid-template-columns:1fr 1fr}.card-value{font-size:19px}
+.j-subtab{font-size:11px;padding:9px 10px}
+}
 </style>
 </head>
 <body>
+
+<!-- SETUP -->
 <div id="setup-screen">
   <div class="setup-box">
     <div class="setup-logo">B3 · Bovespa</div>
     <div class="setup-title">Bem-vindo ao Painel</div>
-    <div class="setup-sub">Configure sua carteira uma unica vez. Seus dados ficam salvos neste dispositivo.</div>
+    <div class="setup-sub">Configure sua carteira uma unica vez. Seus dados ficam salvos neste dispositivo, sem necessidade de cadastro.</div>
     <div class="setup-section-title">Suas Acoes</div>
     <div id="setup-rows"></div>
     <button class="setup-add-btn" onclick="addSetupRow()">+ Adicionar Acao</button>
-    <div class="setup-hint">Informe o ticker (ex: PETR4), a quantidade de acoes e o preco medio de compra.</div>
-    <button class="btn btn-gold" style="width:100%;font-size:14px;padding:12px" onclick="finishSetup()">Criar Minha Carteira</button>
+    <div class="setup-hint">Informe o ticker (ex: PETR4), a quantidade de acoes e o preco medio de compra em reais.</div>
+    <button class="btn btn-gold" style="width:100%;font-size:15px;padding:15px;border-radius:14px" onclick="finishSetup()">Criar Minha Carteira</button>
   </div>
 </div>
+
+<!-- APP -->
 <div id="main-content" style="display:none">
   <div class="app">
+
+    <!-- HEADER -->
     <div class="header">
       <div>
         <div class="header-eyebrow">B3 · Bovespa</div>
@@ -132,25 +185,45 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
       </div>
     </div>
 
+    <!-- TAB CARTEIRA -->
     <div id="tab-carteira">
       <div class="btn-row">
         <button class="btn btn-gold" id="btn-update" onclick="fetchAllPrices()">Atualizar Cotacoes</button>
         <button class="btn btn-outline" onclick="openAddModal()">+ Adicionar Acao</button>
         <button class="reset-btn" onclick="resetApp()">Reiniciar carteira</button>
       </div>
+
       <div class="cards">
-        <div class="card"><div class="card-label">Total Investido</div><div class="card-value muted" id="c-inv">-</div></div>
-        <div class="card"><div class="card-label">Valor Hoje</div><div class="card-value gold" id="c-atual">-</div></div>
-        <div class="card"><div class="card-label">Lucro / Prejuizo R$</div><div class="card-value" id="c-rbrl">-</div></div>
-        <div class="card"><div class="card-label">Lucro / Prejuizo %</div><div class="card-value" id="c-rpct">-</div></div>
+        <div class="card" style="--ca:#0a84ff">
+          <div class="card-accent" style="background:#0a84ff"></div>
+          <div class="card-label">Total Investido</div>
+          <div class="card-value muted" id="c-inv">—</div>
+        </div>
+        <div class="card">
+          <div class="card-accent" style="background:#ff9f0a"></div>
+          <div class="card-label">Valor Hoje</div>
+          <div class="card-value gold" id="c-atual">—</div>
+        </div>
+        <div class="card">
+          <div class="card-accent" style="background:#30d158"></div>
+          <div class="card-label">Lucro / Prejuizo R$</div>
+          <div class="card-value" id="c-rbrl">—</div>
+        </div>
+        <div class="card">
+          <div class="card-accent" style="background:#bf5af2"></div>
+          <div class="card-label">Lucro / Prejuizo %</div>
+          <div class="card-value" id="c-rpct">—</div>
+        </div>
       </div>
+
       <div class="pie-wrap">
-        <div class="card-label" style="margin-bottom:14px">Alocacao</div>
+        <div class="pie-section-title">Alocacao da Carteira</div>
         <div class="pie-inner">
-          <svg id="pie-svg" viewBox="0 0 200 200" width="150" height="150" style="flex-shrink:0"></svg>
+          <svg id="pie-svg" viewBox="0 0 200 200" width="170" height="170" style="flex-shrink:0"></svg>
           <div class="pie-legend" id="pie-legend"></div>
         </div>
       </div>
+
       <div class="table-wrap">
         <div class="table-head">Posicoes Detalhadas</div>
         <div style="overflow-x:auto">
@@ -164,44 +237,56 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
         </div>
       </div>
     </div>
+
+    <!-- TAB JORNAL -->
     <div id="tab-jornal" style="display:none">
-      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:14px">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:14px;margin-bottom:22px">
         <div>
-          <div style="font-size:20px;font-weight:700;color:#fff">Jornal de Mercado</div>
-          <div style="font-size:10px;color:var(--muted);margin-top:3px" id="journal-date"></div>
+          <div style="font-size:28px;font-weight:800;color:#fff;letter-spacing:-0.7px">Jornal de Mercado</div>
+          <div style="font-size:13px;color:var(--muted);margin-top:6px" id="journal-date"></div>
         </div>
-        <button class="btn btn-gold" id="btn-journal" onclick="fetchJournal()" style="font-size:13px;padding:10px 22px">Gerar Jornal</button>
+        <button class="btn btn-gold" id="btn-journal" onclick="fetchJournal()" style="font-size:14px;padding:13px 26px">Gerar Jornal</button>
       </div>
+
       <div class="j-subtabs">
         <button class="j-subtab active" data-tab="global" id="jt-global" onclick="switchJournalTab('global')">Geopolitica Global</button>
         <button class="j-subtab" data-tab="relatorios" id="jt-relatorios" onclick="switchJournalTab('relatorios')">Relatorios</button>
         <button class="j-subtab" data-tab="empresas" id="jt-empresas" onclick="switchJournalTab('empresas')">Noticias das Empresas</button>
         <button class="j-subtab" data-tab="macro" id="jt-macro" onclick="switchJournalTab('macro')">Macro Brasil</button>
       </div>
+
       <div id="jc-global"><div class="empty-state">Clique em Gerar Jornal para receber o briefing do dia.</div></div>
       <div id="jc-relatorios" style="display:none"><div class="empty-state">Clique em Gerar Jornal para ver os relatorios trimestrais.</div></div>
       <div id="jc-empresas" style="display:none"><div class="empty-state">Clique em Gerar Jornal para ver as noticias das empresas.</div></div>
       <div id="jc-macro" style="display:none"><div class="empty-state">Clique em Gerar Jornal para ver o panorama macroeconomico.</div></div>
     </div>
+
+    <!-- TAB OPERACAO -->
     <div id="tab-operacao" style="display:none">
-      <div style="font-size:20px;font-weight:700;color:#fff;margin-bottom:4px">Registrar Operacao</div>
-      <div style="font-size:11px;color:var(--muted);margin-bottom:18px">Compra ou venda atualiza sua carteira automaticamente.</div>
+      <div style="font-size:28px;font-weight:800;color:#fff;letter-spacing:-0.7px;margin-bottom:6px">Registrar Operacao</div>
+      <div style="font-size:13px;color:var(--muted);margin-bottom:24px">Compra ou venda atualiza sua carteira automaticamente.</div>
       <div class="op-form">
         <div class="toggle-row">
-          <button class="tog-btn" id="tog-compra" onclick="setOpType('compra')" style="background:var(--green);color:#07111f">Compra</button>
-          <button class="tog-btn" id="tog-venda" onclick="setOpType('venda')" style="background:var(--bg3);color:var(--muted);border:1px solid #ff6b6b55">Venda</button>
+          <button class="tog-btn" id="tog-compra" onclick="setOpType('compra')" style="background:var(--green);color:#000">Compra</button>
+          <button class="tog-btn" id="tog-venda" onclick="setOpType('venda')" style="background:var(--bg3);color:var(--muted);border:1px solid #ff453a55">Venda</button>
         </div>
         <div class="field"><label>Ticker</label><input type="text" id="op-ticker" placeholder="ex: PETR4" oninput="this.value=this.value.toUpperCase();updatePreview()"/><div class="chips" id="op-chips"></div></div>
         <div class="field"><label>Quantidade</label><input type="number" id="op-qty" placeholder="500" oninput="updatePreview()"/></div>
         <div class="field"><label>Preco por Acao (R$)</label><input type="number" step="0.01" id="op-price" placeholder="18.50" oninput="updatePreview()"/></div>
         <div class="preview-box" id="op-preview" style="display:none"></div>
-        <button class="btn btn-green" id="btn-confirm-op" onclick="confirmOp()" style="width:100%;font-size:13px;padding:11px">Confirmar Compra</button>
+        <button class="btn btn-green" id="btn-confirm-op" onclick="confirmOp()" style="width:100%;font-size:14px;padding:14px">Confirmar Compra</button>
       </div>
       <div id="op-msg"></div>
-      <div class="card" style="max-width:460px;margin-top:14px"><div class="card-label" style="margin-bottom:10px">Posicoes Atuais</div><div id="op-positions"></div></div>
+      <div class="card" style="max-width:480px;margin-top:16px">
+        <div class="card-label" style="margin-bottom:14px">Posicoes Atuais</div>
+        <div id="op-positions"></div>
+      </div>
     </div>
+
   </div>
 </div>
+
+<!-- MODAL -->
 <div class="overlay" id="modal" style="display:none" onclick="if(event.target===this)closeModal()">
   <div class="modal">
     <div class="modal-title" id="modal-title">Nova Acao</div>
@@ -215,6 +300,7 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
     </div>
   </div>
 </div>
+
 <div class="toast" id="toast" style="display:none"></div>
 <script src="app.js"></script>
 </body>
