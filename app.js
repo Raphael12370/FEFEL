@@ -5,8 +5,7 @@ let NID=100,opType='compra',editId=null,toastTimer=null;
 function loadState(){try{return JSON.parse(localStorage.getItem(SK));}catch{return null;}}
 function saveState(){try{localStorage.setItem(SK,JSON.stringify(state));}catch{}}
 
-let state=loadState()||{apiKey:'',claudeKey:'',stocks:[],setupDone:false};
-if(!state.claudeKey)state.claudeKey='';
+let state=loadState()||{stocks:[],setupDone:false};
 
 const f2=v=>(+v).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
 const fp=v=>(v>=0?'+':'')+((+v).toFixed(2))+'%';
@@ -21,14 +20,6 @@ if(!state.setupDone){
 showSetup();
 } else {
 hideSetup();
-if(state.apiKey){
-$('api-key-input').placeholder='✅ Chave brapi salva';
-$('api-banner').style.borderColor='var(--green)';
-}
-if(state.claudeKey){
-$('claude-key-input').placeholder='✅ Chave Claude salva';
-$('claude-banner').style.borderColor='var(--green)';
-}
 renderAll();
 }
 });
@@ -83,27 +74,6 @@ renderAll();
 showToast('Carteira criada! Bem-vindo ao Painel.');
 }
 
-/* ── API KEY brapi.dev ── */
-function saveApiKey(){
-const k=$('api-key-input').value.trim();
-if(!k){showToast('Digite sua chave brapi.dev');return;}
-state.apiKey=k;saveState();
-$('api-key-input').value='';
-$('api-key-input').placeholder='Chave salva!';
-$('api-banner').style.borderColor='var(--green)';
-showToast('Chave brapi salva! Clique em Atualizar Cotacoes.');
-}
-
-/* ── CLAUDE API KEY ── */
-function saveClaudeKey(){
-const k=$('claude-key-input').value.trim();
-if(!k){showToast('Digite sua chave Claude API');return;}
-state.claudeKey=k;saveState();
-$('claude-key-input').value='';
-$('claude-key-input').placeholder='Chave Claude salva!';
-$('claude-banner').style.borderColor='var(--green)';
-showToast('Chave Claude salva! Agora voce pode usar o Jornal.');
-}
 
 /* ── TABS ── */
 function switchTab(name){
@@ -116,7 +86,6 @@ if(name==='operacao')renderOpPositions();
 
 /* ── FETCH PRICES ── */
 async function fetchAllPrices(){
-if(!state.apiKey){showToast('Configure sua chave brapi.dev!');return;}
 const btn=$('btn-update');btn.disabled=true;btn.innerHTML='<span class="spin">⟳</span> Buscando...';
 for(const s of state.stocks)await fetchOne(s);
 btn.disabled=false;btn.textContent='Atualizar Cotacoes';
@@ -126,8 +95,7 @@ saveState();renderAll();
 
 async function fetchOne(stock){
 try{
-const url=`https://brapi.dev/api/quote/${stock.ticker}?token=${state.apiKey}&fundamental=true`;
-const res=await fetch(url);const data=await res.json();
+const res=await fetch(`/api/quotes?ticker=${encodeURIComponent(stock.ticker)}`);const data=await res.json();
 const q=data.results&&data.results[0];
 if(q&&q.regularMarketPrice!=null){
 stock.price=q.regularMarketPrice;
@@ -139,7 +107,6 @@ if(q.shortName&&!stock.nameEdited)stock.name=q.shortName;
 }
 
 async function refreshOne(id){
-if(!state.apiKey){showToast('Configure sua chave!');return;}
 const s=state.stocks.find(x=>x.id===id);if(!s)return;
 await fetchOne(s);saveState();renderAll();showToast(s.ticker+' atualizado!');
 }
@@ -278,81 +245,97 @@ if(ok){saveState();renderAll();renderOpPositions();$('op-ticker').value='';$('op
 function msg_(ok,txt){return`<div class="msg-box" style="background:${ok?'#06d6a011':'#ff6b6b11'};border:1px solid ${ok?'#06d6a044':'#ff6b6b44'};color:${ok?'var(--green)':'var(--red)'}">${txt}</div>`;}
 
 /* ── JOURNAL ── */
-async function fetchJournal(){
-if(!state.claudeKey){
-showToast('Configure sua chave Claude API primeiro!');
-switchTab('carteira');
-setTimeout(()=>$('claude-key-input').focus(),100);
-return;
+const J_TABS=['global','relatorios','empresas','macro'];
+let jActiveTab='global';
+
+const J_SEC_DEFS={
+global:[
+{key:'GEOPOLITICA',color:'#f0b429',icon:'[GEO]'},
+{key:'BANCOS CENTRAIS',color:'#00d4ff',icon:'[BC]'},
+{key:'COMMODITIES',color:'#06d6a0',icon:'[COM]'},
+{key:'CHINA',color:'#ff6b6b',icon:'[CN]'},
+{key:'IMPACTOS NO BRASIL',color:'#a78bfa',icon:'[BR]'}
+],
+macro:[
+{key:'IBOVESPA',color:'#f0b429',icon:'[IBV]'},
+{key:'SELIC E JUROS',color:'#00d4ff',icon:'[SEL]'},
+{key:'INFLACAO',color:'#ff6b6b',icon:'[INF]'},
+{key:'CAMBIO',color:'#06d6a0',icon:'[FX]'},
+{key:'POLITICA FISCAL',color:'#a78bfa',icon:'[FIS]'},
+{key:'DADOS DO DIA',color:'#fb923c',icon:'[DAD]'}
+]
+};
+
+function switchJournalTab(type){
+jActiveTab=type;
+J_TABS.forEach(t=>{
+$('jc-'+t).style.display=t===type?'block':'none';
+$('jt-'+t).classList.toggle('active',t===type);
+});
 }
+
+async function fetchJournal(){
 const btn=$('btn-journal');
 btn.disabled=true;
 btn.innerHTML='<span class="spin">&#8635;</span> Gerando...';
 $('journal-date').textContent=new Date().toLocaleDateString('pt-BR',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
-$('journal-content').innerHTML=`<div class="spinning-wrap"><div class="spin" style="font-size:30px">&#8635;</div><div style="color:var(--muted);margin-top:16px;font-size:12px;line-height:2">Buscando noticias e relatorios...<br>Aguarde ~30 segundos.</div></div>`;
-const stocksPrompt=state.stocks.map(s=>`${s.ticker} - ${s.name.toUpperCase()}\nNoticias recentes, resultados financeiros com numeros, recomendacao de analistas e preco-alvo.`).join('\n\n');
-try{
-const res=await fetch('https://api.anthropic.com/v1/messages',{
-method:'POST',
-headers:{
-'Content-Type':'application/json',
-'x-api-key':state.claudeKey,
-'anthropic-version':'2023-06-01',
-'anthropic-dangerous-direct-browser-access':'true'
-},
-body:JSON.stringify({
-model:'claude-sonnet-4-20250514',
-max_tokens:4000,
-tools:[{type:'web_search_20250305',name:'web_search'}],
-messages:[{role:'user',content:`Voce e um analista financeiro senior. Pesquise noticias de hoje e gere um briefing em portugues com estas secoes (use os titulos exatos em maiusculas):\n\nMERCADO HOJE\nResumo do Ibovespa: pontuacao, variacao, destaques do dia.\n\nCENARIO BRASIL\nSELIC, inflacao, cambio, politica fiscal.\n\nCENARIO GLOBAL\nFed, China, commodities, impactos no Brasil.\n\n${stocksPrompt}\n\nData atual: ${new Date().toLocaleDateString('pt-BR')}. Seja especifico com numeros e cite fontes.`}]
-})
-});
-const data=await res.json();
-if(data.error){
-$('journal-content').innerHTML=`<div class="j-section" style="border-left:3px solid var(--red)"><div class="j-title" style="color:var(--red)">Erro da API</div><p class="j-text">${data.error.message||'Erro desconhecido. Verifique sua chave Claude.'}</p></div>`;
-}else{
-const text=(data.content||[]).filter(b=>b.type==='text').map(b=>b.text).join('\n').trim();
-if(text&&text.length>100){
-renderJournal(text);
-}else{
-$('journal-content').innerHTML=`<div class="j-section" style="border-left:3px solid var(--red)"><div class="j-title" style="color:var(--red)">Resposta vazia</div><p class="j-text">A API retornou uma resposta inesperada. Tente novamente.</p></div>`;
-}
-}
-}catch(e){
-$('journal-content').innerHTML=`<div class="j-section" style="border-left:3px solid var(--red)"><div class="j-title" style="color:var(--red)">Erro de conexao</div><p class="j-text">${e.message}</p></div>`;
-}
+J_TABS.forEach(t=>setJLoading(t));
+await Promise.all(J_TABS.map(t=>fetchJSection(t)));
 btn.disabled=false;
 btn.textContent='Gerar / Atualizar Jornal';
 }
 
-function renderJournal(text){
-const SEC_DEFS=[
-{key:'MERCADO HOJE',color:'#f0b429',icon:'[M]'},
-{key:'CENARIO BRASIL',color:'#00d4ff',icon:'[BR]'},
-{key:'CENARIO GLOBAL',color:'#a78bfa',icon:'[GL]'},
-...state.stocks.map((s,i)=>({key:s.ticker,color:COLORS[i%COLORS.length],icon:'[A]',stock:s}))
-];
+function setJLoading(type){
+$('jc-'+type).innerHTML=`<div class="spinning-wrap"><div class="spin" style="font-size:28px">&#8635;</div><div style="color:var(--muted);margin-top:14px;font-size:12px;line-height:2">Buscando dados...<br>Aguarde ~30 segundos.</div></div>`;
+}
+
+async function fetchJSection(type){
+try{
+const res=await fetch('/api/journal',{
+method:'POST',
+headers:{'Content-Type':'application/json'},
+body:JSON.stringify({type,stocks:state.stocks.map(s=>({ticker:s.ticker,name:s.name})),date:new Date().toLocaleDateString('pt-BR')})
+});
+const data=await res.json();
+if(data.error){
+$('jc-'+type).innerHTML=`<div class="j-section" style="border-left:3px solid var(--red)"><div class="j-title" style="color:var(--red)">Erro</div><p class="j-text">${data.error.message||data.error}</p></div>`;
+}else{
+const text=(data.content||[]).filter(b=>b.type==='text').map(b=>b.text).join('\n').trim();
+if(text&&text.length>50)renderJSection(type,text);
+else $('jc-'+type).innerHTML=`<div class="j-section" style="border-left:3px solid var(--gold)"><p class="j-text">Nenhum conteudo retornado. Tente novamente.</p></div>`;
+}
+}catch(e){
+$('jc-'+type).innerHTML=`<div class="j-section" style="border-left:3px solid var(--red)"><div class="j-title" style="color:var(--red)">Erro de conexao</div><p class="j-text">${e.message}</p></div>`;
+}
+}
+
+function renderJSection(type,text){
+const isCompany=type==='relatorios'||type==='empresas';
+const subtitle=type==='relatorios'?'Ultimos 4 Trimestres':'Noticias do Dia';
+const defs=isCompany
+?state.stocks.map((s,i)=>({key:s.ticker,color:COLORS[i%COLORS.length],stock:s}))
+:J_SEC_DEFS[type]||[];
 const lines=text.split('\n');
 const sections=[];
 let cur=null;
 for(const line of lines){
 const up=line.trim().toUpperCase();
-const def=SEC_DEFS.find(d=>up.startsWith(d.key));
+const def=defs.find(d=>up.startsWith(d.key));
 if(def){if(cur)sections.push(cur);cur={def,title:line.trim(),body:[]};}
 else if(cur)cur.body.push(line);
 }
 if(cur)sections.push(cur);
 if(!sections.length){
-$('journal-content').innerHTML=`<div class="j-section"><p class="j-text">${text.replace(/\n/g,'<br>')}</p></div>`;
+$('jc-'+type).innerHTML=`<div class="j-section"><p class="j-text">${text.replace(/\n/g,'<br>')}</p></div>`;
 return;
 }
-$('journal-content').innerHTML=sections.map(sec=>{
-const bodyText=sec.body.join('\n').trim().replace(/\n/g,'<br>');
+$('jc-'+type).innerHTML=sections.map(sec=>{
+const body=sec.body.join('\n').trim().replace(/\n/g,'<br>');
 if(sec.def.stock){
 const s=sec.def.stock,c=sec.def.color;
-return`<div class="j-company"><div class="j-company-head"><div class="j-chip" style="background:${c}22;border:1px solid ${c}44;color:${c}">${s.ticker}</div><div><div style="font-weight:700;color:#fff;font-size:14px">${s.name}</div><div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:1px">Analise detalhada</div></div></div><div class="j-company-body"><p class="j-text">${bodyText}</p></div></div>`;
+return`<div class="j-company"><div class="j-company-head"><div class="j-chip" style="background:${c}22;border:1px solid ${c}44;color:${c}">${s.ticker}</div><div><div style="font-weight:700;color:#fff;font-size:14px">${s.name}</div><div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:1px">${subtitle}</div></div></div><div class="j-company-body"><p class="j-text">${body}</p></div></div>`;
 }
-return`<div class="j-section" style="border-left:3px solid ${sec.def.color}"><div class="j-title" style="color:${sec.def.color}">${sec.def.icon} ${sec.title}</div><p class="j-text">${bodyText}</p></div>`;
+return`<div class="j-section" style="border-left:3px solid ${sec.def.color}"><div class="j-title" style="color:${sec.def.color}">${sec.def.icon} ${sec.title}</div><p class="j-text">${body}</p></div>`;
 }).join('');
 }
 

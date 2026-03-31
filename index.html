@@ -34,6 +34,13 @@ body{background:var(--bg);color:var(--text);font-family:'Sora',sans-serif;font-s
 .tabs{display:flex;gap:4px;background:var(--bg2);border-radius:10px;padding:5px}
 .tab{border:none;border-radius:7px;padding:8px 14px;font-family:'Sora',sans-serif;font-size:12px;font-weight:600;cursor:pointer;color:var(--muted);background:transparent;transition:all .2s;white-space:nowrap}
 .tab.active{background:var(--gold);color:#07111f}
+.j-subtabs{display:flex;gap:4px;background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:5px;margin-bottom:16px;overflow-x:auto}
+.j-subtab{border:none;border-radius:7px;padding:8px 16px;font-family:'Sora',sans-serif;font-size:11px;font-weight:600;cursor:pointer;color:var(--muted);background:transparent;transition:all .2s;white-space:nowrap;flex:1;text-align:center}
+.j-subtab.active{color:#fff;font-weight:700}
+.j-subtab[data-tab="global"].active{background:#f0b42922;border:1px solid #f0b42955;color:#f0b429}
+.j-subtab[data-tab="relatorios"].active{background:#00d4ff22;border:1px solid #00d4ff55;color:#00d4ff}
+.j-subtab[data-tab="empresas"].active{background:#06d6a022;border:1px solid #06d6a055;color:#06d6a0}
+.j-subtab[data-tab="macro"].active{background:#a78bfa22;border:1px solid #a78bfa55;color:#a78bfa}
 .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(155px,1fr));gap:10px;margin-bottom:16px}
 .card{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:14px 16px}
 .card-label{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:7px}
@@ -116,7 +123,7 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
       <div>
         <div class="header-eyebrow">B3 · Bovespa</div>
         <div class="header-name">Painel de Investimentos</div>
-        <div class="header-sub" id="last-update">Configure sua chave brapi.dev para ativar cotacoes</div>
+        <div class="header-sub" id="last-update">Clique em Atualizar Cotacoes para buscar os precos</div>
       </div>
       <div class="tabs">
         <button class="tab active" onclick="switchTab('carteira')">Carteira</button>
@@ -124,16 +131,7 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
         <button class="tab" onclick="switchTab('operacao')">Operacao</button>
       </div>
     </div>
-    <div class="api-banner" id="api-banner">
-      <span class="api-banner-text">Chave <strong>brapi.dev</strong> — cotacoes B3 em tempo real (gratuita). Acesse <a href="https://brapi.dev" target="_blank" rel="noopener">brapi.dev</a> e cole sua chave:</span>
-      <input class="api-key-input" id="api-key-input" type="text" placeholder="Cole sua chave brapi aqui..."/>
-      <button class="btn btn-gold" onclick="saveApiKey()">Salvar Chave</button>
-    </div>
-    <div class="api-banner" id="claude-banner" style="border-color:#a78bfa44">
-      <span class="api-banner-text">Chave <strong>Claude API</strong> — necessaria para o Jornal de Mercado. Acesse <a href="https://console.anthropic.com" target="_blank" rel="noopener">console.anthropic.com</a> e cole sua chave:</span>
-      <input class="api-key-input" id="claude-key-input" type="password" placeholder="sk-ant-..."/>
-      <button class="btn btn-gold" onclick="saveClaudeKey()">Salvar Chave</button>
-    </div>
+
     <div id="tab-carteira">
       <div class="btn-row">
         <button class="btn btn-gold" id="btn-update" onclick="fetchAllPrices()">Atualizar Cotacoes</button>
@@ -167,14 +165,23 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
       </div>
     </div>
     <div id="tab-jornal" style="display:none">
-      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:18px">
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:14px">
         <div>
           <div style="font-size:20px;font-weight:700;color:#fff">Jornal de Mercado</div>
           <div style="font-size:10px;color:var(--muted);margin-top:3px" id="journal-date"></div>
         </div>
         <button class="btn btn-gold" id="btn-journal" onclick="fetchJournal()" style="font-size:13px;padding:10px 22px">Gerar Jornal</button>
       </div>
-      <div id="journal-content"><div class="empty-state"><div style="font-size:40px;margin-bottom:14px"></div>Clique em Gerar Jornal para receber o briefing do dia.</div></div>
+      <div class="j-subtabs">
+        <button class="j-subtab active" data-tab="global" id="jt-global" onclick="switchJournalTab('global')">Geopolitica Global</button>
+        <button class="j-subtab" data-tab="relatorios" id="jt-relatorios" onclick="switchJournalTab('relatorios')">Relatorios</button>
+        <button class="j-subtab" data-tab="empresas" id="jt-empresas" onclick="switchJournalTab('empresas')">Noticias das Empresas</button>
+        <button class="j-subtab" data-tab="macro" id="jt-macro" onclick="switchJournalTab('macro')">Macro Brasil</button>
+      </div>
+      <div id="jc-global"><div class="empty-state">Clique em Gerar Jornal para receber o briefing do dia.</div></div>
+      <div id="jc-relatorios" style="display:none"><div class="empty-state">Clique em Gerar Jornal para ver os relatorios trimestrais.</div></div>
+      <div id="jc-empresas" style="display:none"><div class="empty-state">Clique em Gerar Jornal para ver as noticias das empresas.</div></div>
+      <div id="jc-macro" style="display:none"><div class="empty-state">Clique em Gerar Jornal para ver o panorama macroeconomico.</div></div>
     </div>
     <div id="tab-operacao" style="display:none">
       <div style="font-size:20px;font-weight:700;color:#fff;margin-bottom:4px">Registrar Operacao</div>
