@@ -152,6 +152,37 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',-apple-system,Bl
 .toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%);background:rgba(28,28,30,.95);border:1px solid var(--border);border-radius:14px;padding:13px 22px;font-size:13px;color:var(--text);z-index:400;white-space:nowrap;pointer-events:none;animation:fadeUp .3s ease;box-shadow:0 8px 40px rgba(0,0,0,.6);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px)}
 @keyframes fadeUp{from{opacity:0;transform:translateX(-50%) translateY(10px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
 .green{color:var(--green)}.red{color:var(--red)}.gold{color:var(--gold)}.muted{color:var(--muted)}.bold{font-weight:700}
+/* ── NEWS ── */
+.news-section{background:var(--bg2);border:1px solid var(--border);border-radius:20px;overflow:hidden;margin-bottom:16px}
+.news-section-hdr{padding:20px 26px;display:flex;justify-content:space-between;align-items:center;cursor:pointer;user-select:none;transition:background .15s}
+.news-section-hdr:hover{background:var(--bg3)}
+.news-section-ttl{font-size:19px;font-weight:800;color:#fff;letter-spacing:-0.4px;display:flex;align-items:center;gap:12px}
+.news-count{font-size:11px;font-weight:600;color:var(--muted);background:var(--bg3);border-radius:20px;padding:3px 11px}
+.news-chevron{color:var(--muted);font-size:11px}
+.news-section-body{padding:4px 16px 16px}
+.news-card{background:var(--bg3);border:1px solid var(--border);border-radius:16px;overflow:hidden;margin-bottom:12px;transition:border-color .2s}
+.news-card:hover{border-color:var(--muted2)}
+.news-card-img{width:100%;height:190px;object-fit:cover;display:block}
+.news-card-body{padding:18px 20px}
+.news-card-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:8px}
+.news-src-wrap{display:flex;align-items:center;gap:8px}
+.news-src-logo{width:18px;height:18px;border-radius:4px;object-fit:contain;background:#fff;padding:2px;flex-shrink:0}
+.news-src-name{font-size:11px;font-weight:700;color:var(--muted);letter-spacing:0.5px;text-transform:uppercase}
+.news-time{font-size:11px;color:var(--muted2)}
+.news-headline{display:block;font-size:16px;font-weight:700;color:var(--text);line-height:1.45;letter-spacing:-0.3px;text-decoration:none;margin-bottom:9px;font-family:'Inter',system-ui,sans-serif}
+.news-headline:hover{color:var(--gold)}
+.news-desc{font-size:13px;color:var(--muted);line-height:1.7;font-family:'Inter',system-ui,sans-serif;margin-bottom:0}
+.news-card-footer{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-top:14px}
+.news-sentiment-badge{font-size:10px;font-weight:700;letter-spacing:1.5px;padding:5px 11px;border-radius:6px}
+.news-urgency{font-size:10px;font-weight:700;letter-spacing:1px}
+.news-analysis-btn{font-size:12px;color:var(--gold);background:transparent;border:1px solid #ff9f0a33;border-radius:7px;cursor:pointer;padding:5px 12px;font-family:'Inter',system-ui,sans-serif;font-weight:600;transition:background .15s}
+.news-analysis-btn:hover{background:#ff9f0a15}
+.news-analysis{background:var(--bg2);border-radius:12px;padding:16px 18px;margin-top:14px;border:1px solid var(--border)}
+.news-analysis-text{font-size:14px;color:rgba(235,235,245,.8);line-height:1.85;font-family:'Inter',system-ui,sans-serif}
+.news-sub-hdr{font-size:13px;font-weight:700;color:inherit;padding-left:12px;margin:16px 0 10px;font-family:'Inter',system-ui,sans-serif;letter-spacing:-0.2px;border-left:3px solid currentColor}
+.news-skeleton{background:var(--bg3);border-radius:14px;padding:20px;margin-bottom:12px}
+.sk-line{height:12px;background:var(--muted2);border-radius:6px;margin-bottom:10px;animation:skpulse 1.5s ease-in-out infinite}
+@keyframes skpulse{0%,100%{opacity:.25}50%{opacity:.55}}
 .empty-state{text-align:center;padding:80px 40px;color:var(--muted);line-height:2.2;font-size:14px}
 .spinning-wrap{text-align:center;padding:80px 40px}
 input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
@@ -195,6 +226,7 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
       <div class="tabs">
         <button class="tab active" onclick="switchTab('carteira')">Carteira</button>
         <button class="tab" onclick="switchTab('jornal')">Jornal</button>
+        <button class="tab" onclick="switchTab('noticias')">Noticias</button>
         <button class="tab" onclick="switchTab('operacao')">Operacao</button>
       </div>
     </div>
@@ -273,6 +305,50 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
       <div id="jc-relatorios" style="display:none"><div class="empty-state">Clique em Gerar Jornal para ver os relatorios trimestrais.</div></div>
       <div id="jc-empresas" style="display:none"><div class="empty-state">Clique em Gerar Jornal para ver as noticias das empresas.</div></div>
       <div id="jc-macro" style="display:none"><div class="empty-state">Clique em Gerar Jornal para ver o panorama macroeconomico.</div></div>
+    </div>
+
+    <!-- TAB NOTICIAS -->
+    <div id="tab-noticias" style="display:none">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:14px;margin-bottom:26px">
+        <div>
+          <div style="font-size:28px;font-weight:800;color:#fff;letter-spacing:-0.7px">Noticias & Analise</div>
+          <div style="font-size:13px;color:var(--muted);margin-top:6px" id="news-last-update">Clique em Atualizar para buscar as noticias do dia.</div>
+        </div>
+        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+          <button class="btn btn-ghost" id="btn-news-auto" onclick="toggleNewsAuto()">Auto 30min</button>
+          <button class="btn btn-gold" id="btn-news-update" onclick="fetchAllNews()">Atualizar Noticias</button>
+        </div>
+      </div>
+
+      <div class="news-section">
+        <div class="news-section-hdr" onclick="toggleNSec('global')">
+          <div class="news-section-ttl">Visao Global<span class="news-count" id="nc-global"></span></div>
+          <span class="news-chevron" id="nchev-global">&#9650;</span>
+        </div>
+        <div class="news-section-body" id="nsb-global">
+          <div class="empty-state" style="padding:40px">Clique em Atualizar para buscar as noticias globais.</div>
+        </div>
+      </div>
+
+      <div class="news-section">
+        <div class="news-section-hdr" onclick="toggleNSec('setores')">
+          <div class="news-section-ttl">Por Setor<span class="news-count" id="nc-setores"></span></div>
+          <span class="news-chevron" id="nchev-setores">&#9650;</span>
+        </div>
+        <div class="news-section-body" id="nsb-setores">
+          <div class="empty-state" style="padding:40px">Clique em Atualizar para buscar noticias por setor.</div>
+        </div>
+      </div>
+
+      <div class="news-section">
+        <div class="news-section-hdr" onclick="toggleNSec('carteira')">
+          <div class="news-section-ttl">Minha Carteira<span class="news-count" id="nc-carteira"></span></div>
+          <span class="news-chevron" id="nchev-carteira">&#9650;</span>
+        </div>
+        <div class="news-section-body" id="nsb-carteira">
+          <div class="empty-state" style="padding:40px">Clique em Atualizar para buscar noticias da sua carteira.</div>
+        </div>
+      </div>
     </div>
 
     <!-- TAB OPERACAO -->

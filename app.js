@@ -78,7 +78,7 @@ showToast('Carteira criada! Bem-vindo ao Painel.');
 
 /* ── TABS ── */
 function switchTab(name){
-['carteira','jornal','operacao'].forEach((t,i)=>{
+['carteira','jornal','noticias','operacao'].forEach((t,i)=>{
 $('tab-'+t).style.display=t===name?'block':'none';
 document.querySelectorAll('.tab')[i].classList.toggle('active',t===name);
 });
@@ -423,6 +423,138 @@ return`<div class="j-article">
 </div>`;
 }).join('');
 }
+
+/* ── NEWS ── */
+const SECTORS_LIST=['bancos','energia','mineracao','varejo','utilities'];
+const SECTOR_META={
+bancos:{label:'Bancos & Financas',color:'#0a84ff'},
+energia:{label:'Energia & Petroleo',color:'#ff9f0a'},
+mineracao:{label:'Mineracao & Agro',color:'#30d158'},
+varejo:{label:'Varejo & Consumo',color:'#ff453a'},
+utilities:{label:'Utilities',color:'#bf5af2'}
+};
+
+let newsExpanded={global:true,setores:true,carteira:true};
+let newsAutoTimer=null;
+
+function toggleNSec(key){
+newsExpanded[key]=!newsExpanded[key];
+$('nsb-'+key).style.display=newsExpanded[key]?'block':'none';
+$('nchev-'+key).innerHTML=newsExpanded[key]?'&#9650;':'&#9660;';
+}
+
+function toggleNewsAuto(){
+if(newsAutoTimer){
+clearInterval(newsAutoTimer);newsAutoTimer=null;
+$('btn-news-auto').textContent='Auto 30min';
+$('btn-news-auto').className='btn btn-ghost';
+}else{
+newsAutoTimer=setInterval(fetchAllNews,30*60*1000);
+$('btn-news-auto').textContent='Auto: Ativo';
+$('btn-news-auto').className='btn btn-outline';
+}
+}
+
+function setNLoading(id){
+$('nsb-'+id).innerHTML=[1,2,3].map(()=>`<div class="news-skeleton"><div class="sk-line" style="width:55%"></div><div class="sk-line" style="width:100%"></div><div class="sk-line" style="width:75%"></div><div class="sk-line" style="width:90%"></div></div>`).join('');
+}
+
+async function fetchAllNews(){
+const btn=$('btn-news-update');
+btn.disabled=true;btn.innerHTML='<span class="spin">&#8635;</span> Buscando...';
+setNLoading('global');setNLoading('setores');setNLoading('carteira');
+await Promise.all([fetchNewsGlobal(),fetchNewsSetores(),fetchNewsCarteira()]);
+btn.disabled=false;btn.textContent='Atualizar Noticias';
+$('news-last-update').textContent='Atualizado as '+new Date().toLocaleTimeString('pt-BR');
+}
+
+async function fetchNewsGlobal(){
+try{
+const res=await fetch('/api/news',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({type:'global'})});
+const data=await res.json();
+if(data.error){$('nsb-global').innerHTML=newsErr(data.error);return;}
+$('nsb-global').innerHTML=newsCardsHTML(data.articles);
+$('nc-global').textContent=data.articles.length+' noticias';
+}catch(e){$('nsb-global').innerHTML=newsErr(e.message);}
+}
+
+async function fetchNewsSetores(){
+try{
+const results=await Promise.all(SECTORS_LIST.map(s=>
+fetch('/api/news',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({type:'sector',query:s})})
+.then(r=>r.json()).catch(e=>({error:e.message}))
+));
+let total=0;
+$('nsb-setores').innerHTML=results.map((data,i)=>{
+const s=SECTORS_LIST[i],m=SECTOR_META[s];
+if(data.error)return`<div class="news-sub-hdr" style="color:${m.color}">${m.label}</div>${newsErr(data.error)}`;
+total+=data.articles.length;
+return`<div class="news-sub-hdr" style="color:${m.color}">${m.label}</div>${newsCardsHTML(data.articles)}`;
+}).join('');
+$('nc-setores').textContent=total+' noticias';
+}catch(e){$('nsb-setores').innerHTML=newsErr(e.message);}
+}
+
+async function fetchNewsCarteira(){
+if(!state.stocks.length){$('nsb-carteira').innerHTML='<div class="empty-state" style="padding:40px">Nenhuma acao na carteira.</div>';return;}
+try{
+const results=await Promise.all(state.stocks.map(s=>
+fetch('/api/news',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({type:'stock',query:`"${s.ticker}" OR "${s.name.split(' ')[0]}"`})})
+.then(r=>r.json()).catch(e=>({error:e.message}))
+));
+let total=0;
+$('nsb-carteira').innerHTML=results.map((data,i)=>{
+const s=state.stocks[i],c=COLORS[i%COLORS.length];
+if(data.error)return`<div class="news-sub-hdr" style="color:${c}">${s.ticker} — ${s.name}</div>${newsErr(data.error)}`;
+total+=data.articles.length;
+return`<div class="news-sub-hdr" style="color:${c}">${s.ticker} — ${s.name}</div>${newsCardsHTML(data.articles)}`;
+}).join('');
+$('nc-carteira').textContent=total+' noticias';
+}catch(e){$('nsb-carteira').innerHTML=newsErr(e.message);}
+}
+
+function newsCardsHTML(articles){
+if(!articles||!articles.length)return'<div class="empty-state" style="padding:30px 20px;font-size:13px">Nenhuma noticia encontrada.</div>';
+return articles.map((a,i)=>{
+const uid='na'+Date.now()+i+Math.random().toString(36).slice(2,6);
+const sentMap={POSITIVO:{bg:'#30d15820',c:'#30d158',b:'#30d15840',l:'POSITIVO ↑'},NEGATIVO:{bg:'#ff453a20',c:'#ff453a',b:'#ff453a40',l:'NEGATIVO ↓'},NEUTRO:{bg:'#8e8e9320',c:'#8e8e93',b:'#8e8e9340',l:'NEUTRO →'}};
+const sm=sentMap[a.sentimento]||sentMap.NEUTRO;
+const urgC=a.urgencia==='ALTO'?'#ff453a':a.urgencia==='MEDIO'?'#ff9f0a':'#48484a';
+const domain=((u)=>{try{return new URL(u).hostname.replace('www.','');}catch{return '';}})(a.url||'');
+const logoSrc=domain?`https://logo.clearbit.com/${domain}`:'';
+const fbId='nlfb'+uid;
+const ago=((d)=>{if(!d)return'';const s=Math.floor((Date.now()-new Date(d))/1000);if(s<60)return s+'s atras';if(s<3600)return Math.floor(s/60)+'min atras';if(s<86400)return Math.floor(s/3600)+'h atras';return Math.floor(s/86400)+'d atras';})(a.publishedAt);
+return`<div class="news-card">
+${a.image?`<img class="news-card-img" src="${a.image}" alt="" onerror="this.style.display='none'" loading="lazy"/>`:''}
+<div class="news-card-body">
+<div class="news-card-top">
+<div class="news-src-wrap">
+${logoSrc?`<img class="news-src-logo" src="${logoSrc}" alt="" onerror="this.style.display='none'" loading="lazy"/>`:''}
+<span class="news-src-name">${a.source?.name||domain||'Fonte'}</span>
+</div>
+<div style="display:flex;align-items:center;gap:10px">
+<span class="news-urgency" style="color:${urgC}">${a.urgencia||''}</span>
+<span class="news-time">${ago}</span>
+</div>
+</div>
+<a class="news-headline" href="${a.url||'#'}" target="_blank" rel="noopener">${a.title||'Sem titulo'}</a>
+${a.description?`<p class="news-desc">${a.description}</p>`:''}
+<div class="news-card-footer">
+<span class="news-sentiment-badge" style="background:${sm.bg};color:${sm.c};border:1px solid ${sm.b}">${sm.l}</span>
+${a.analise?`<button class="news-analysis-btn" onclick="toggleNAnalysis('${uid}',this)">Ver analise ▾</button>`:''}
+</div>
+${a.analise?`<div class="news-analysis" id="${uid}" style="display:none"><p class="news-analysis-text">${a.analise}</p></div>`:''}
+</div>
+</div>`;
+}).join('');}
+
+function toggleNAnalysis(id,btn){
+const el=$(id);const show=el.style.display==='none';
+el.style.display=show?'block':'none';
+btn.textContent=show?'Fechar analise ▴':'Ver analise ▾';
+}
+
+function newsErr(msg){return`<div class="j-error" style="margin:4px 0 12px"><p class="j-text" style="font-size:13px">${msg}</p></div>`;}
 
 /* ── RESET ── */
 function resetApp(){
