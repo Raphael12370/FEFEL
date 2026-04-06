@@ -249,22 +249,66 @@ function msg_(ok,txt){return`<div class="msg-box" style="background:${ok?'#06d6a
 const J_TABS=['global','relatorios','empresas','macro'];
 let jActiveTab='global';
 
-const J_SEC_DEFS={
-global:[
-{key:'GEOPOLITICA',color:'#f0b429',icon:'[GEO]'},
-{key:'BANCOS CENTRAIS',color:'#00d4ff',icon:'[BC]'},
-{key:'COMMODITIES',color:'#06d6a0',icon:'[COM]'},
-{key:'CHINA',color:'#ff6b6b',icon:'[CN]'},
-{key:'IMPACTOS NO BRASIL',color:'#a78bfa',icon:'[BR]'}
-],
-macro:[
-{key:'IBOVESPA',color:'#f0b429',icon:'[IBV]'},
-{key:'SELIC E JUROS',color:'#00d4ff',icon:'[SEL]'},
-{key:'INFLACAO',color:'#ff6b6b',icon:'[INF]'},
-{key:'CAMBIO',color:'#06d6a0',icon:'[FX]'},
-{key:'POLITICA FISCAL',color:'#a78bfa',icon:'[FIS]'},
-{key:'DADOS DO DIA',color:'#fb923c',icon:'[DAD]'}
-]
+const TICKER_DOMAINS={
+PETR4:'petrobras.com.br',PETR3:'petrobras.com.br',
+VALE3:'vale.com',VALE5:'vale.com',
+MGLU3:'magazineluiza.com.br',
+ITUB4:'itau.com.br',ITUB3:'itau.com.br',ITSA4:'itausa.com.br',ITSA3:'itausa.com.br',
+BBDC4:'bradesco.com.br',BBDC3:'bradesco.com.br',
+ABEV3:'ambev.com.br',
+WEGE3:'weg.net',
+RENT3:'localiza.com',
+LREN3:'lojasrenner.com.br',
+JBSS3:'jbs.com.br',
+GGBR4:'gerdau.com',GGBR3:'gerdau.com',
+BPAC11:'btgpactual.com',
+RADL3:'raia.com.br',
+BRFS3:'brf-global.com',
+MRVE3:'mrv.com.br',
+BBAS3:'bb.com.br',
+SANB11:'santander.com.br',
+SUZB3:'suzano.com.br',
+EMBR3:'embraer.com',
+TOTS3:'totvs.com',
+PRIO3:'prioil.com.br',
+DIRR3:'direcional.com.br',
+KLBN11:'klabin.com.br',
+CMIG4:'cemig.com.br',
+ELET3:'eletrobras.com.br',ELET6:'eletrobras.com.br',
+VIVT3:'vivo.com.br',
+TIMS3:'tim.com.br',
+COGN3:'cogna.com.br',
+FLRY3:'fleury.com.br',
+AZUL4:'voeazul.com.br',
+GOLL4:'voegol.com.br',
+CYRE3:'cyrela.com.br',
+BEEF3:'minervafoods.com',
+HAPV3:'hapvida.com.br',
+};
+
+function getLogoUrl(ticker,name){
+const domain=TICKER_DOMAINS[ticker];
+if(domain)return`https://logo.clearbit.com/${domain}`;
+const first=(name||ticker).split(' ')[0].toLowerCase().replace(/[^a-z]/g,'');
+return`https://logo.clearbit.com/${first}.com.br`;
+}
+
+const J_SEC_META={
+global:{
+'GEOPOLITICA':{tag:'Geopolitica',color:'#ff9f0a',hero:'j-hero-global'},
+'BANCOS CENTRAIS':{tag:'Bancos Centrais',color:'#5ac8fa',hero:'j-hero-global'},
+'COMMODITIES':{tag:'Commodities',color:'#30d158',hero:'j-hero-global'},
+'CHINA':{tag:'China',color:'#ff453a',hero:'j-hero-global'},
+'IMPACTOS NO BRASIL':{tag:'Impactos no Brasil',color:'#bf5af2',hero:'j-hero-global'},
+},
+macro:{
+'IBOVESPA':{tag:'Ibovespa',color:'#ff9f0a',hero:'j-hero-macro'},
+'SELIC E JUROS':{tag:'Juros & SELIC',color:'#5ac8fa',hero:'j-hero-macro'},
+'INFLACAO':{tag:'Inflacao',color:'#ff453a',hero:'j-hero-macro'},
+'CAMBIO':{tag:'Cambio',color:'#30d158',hero:'j-hero-macro'},
+'POLITICA FISCAL':{tag:'Politica Fiscal',color:'#bf5af2',hero:'j-hero-macro'},
+'DADOS DO DIA':{tag:'Indicadores',color:'#ff9f0a',hero:'j-hero-macro'},
+}
 };
 
 function switchJournalTab(type){
@@ -299,23 +343,26 @@ body:JSON.stringify({type,stocks:state.stocks.map(s=>({ticker:s.ticker,name:s.na
 });
 const data=await res.json();
 if(data.error){
-$('jc-'+type).innerHTML=`<div class="j-section" style="border-left:3px solid var(--red)"><div class="j-title" style="color:var(--red)">Erro</div><p class="j-text">${data.error.message||data.error}</p></div>`;
+$('jc-'+type).innerHTML=`<div class="j-error"><div style="font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--red);margin-bottom:10px">Erro</div><p class="j-text">${data.error.message||data.error}</p></div>`;
 }else{
 const text=(data.content||[]).filter(b=>b.type==='text').map(b=>b.text).join('\n').trim();
 if(text&&text.length>50)renderJSection(type,text);
-else $('jc-'+type).innerHTML=`<div class="j-section" style="border-left:3px solid var(--gold)"><p class="j-text">Nenhum conteudo retornado. Tente novamente.</p></div>`;
+else $('jc-'+type).innerHTML=`<div class="j-error" style="border-color:#ff9f0a44"><p class="j-text">Nenhum conteudo retornado. Tente novamente.</p></div>`;
 }
 }catch(e){
-$('jc-'+type).innerHTML=`<div class="j-section" style="border-left:3px solid var(--red)"><div class="j-title" style="color:var(--red)">Erro de conexao</div><p class="j-text">${e.message}</p></div>`;
+$('jc-'+type).innerHTML=`<div class="j-error"><div style="font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--red);margin-bottom:10px">Erro de Conexao</div><p class="j-text">${e.message}</p></div>`;
 }
 }
 
 function renderJSection(type,text){
 const isCompany=type==='relatorios'||type==='empresas';
-const subtitle=type==='relatorios'?'Ultimos 4 Trimestres':'Noticias do Dia';
+const subtitle=type==='relatorios'?'Relatorios Trimestrais':'Noticias do Dia';
+const heroClass=type==='empresas'?'j-hero-empresas':'j-hero-relatorios';
+const meta=J_SEC_META[type]||{};
 const defs=isCompany
 ?state.stocks.map((s,i)=>({key:s.ticker,color:COLORS[i%COLORS.length],stock:s}))
-:J_SEC_DEFS[type]||[];
+:Object.entries(meta).map(([key,m])=>({key,...m}));
+
 const lines=text.split('\n');
 const sections=[];
 let cur=null;
@@ -326,17 +373,54 @@ if(def){if(cur)sections.push(cur);cur={def,title:line.trim(),body:[]};}
 else if(cur)cur.body.push(line);
 }
 if(cur)sections.push(cur);
+
+const date=$('journal-date').textContent||new Date().toLocaleDateString('pt-BR',{day:'numeric',month:'long',year:'numeric'});
+
 if(!sections.length){
-$('jc-'+type).innerHTML=`<div class="j-section"><p class="j-text">${text.replace(/\n/g,'<br>')}</p></div>`;
+$('jc-'+type).innerHTML=`<div class="j-article"><div class="j-article-body"><p class="j-text">${text.replace(/\n/g,'<br>')}</p></div></div>`;
 return;
 }
+
 $('jc-'+type).innerHTML=sections.map(sec=>{
 const body=sec.body.join('\n').trim().replace(/\n/g,'<br>');
+
 if(sec.def.stock){
 const s=sec.def.stock,c=sec.def.color;
-return`<div class="j-company"><div class="j-company-head"><div class="j-chip" style="background:${c}22;border:1px solid ${c}44;color:${c}">${s.ticker}</div><div><div style="font-weight:700;color:#fff;font-size:14px">${s.name}</div><div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:1px">${subtitle}</div></div></div><div class="j-company-body"><p class="j-text">${body}</p></div></div>`;
+const logoUrl=getLogoUrl(s.ticker,s.name);
+const fbId='fb-'+s.ticker+'-'+type;
+return`<div class="j-article">
+<div class="j-company-header" style="border-left:4px solid ${c}">
+<div class="j-company-logo-wrap">
+<img class="j-company-logo" src="${logoUrl}" alt="${s.ticker}" onerror="this.style.display='none';document.getElementById('${fbId}').style.display='flex'"/>
+<div class="j-company-logo-fallback" id="${fbId}" style="background:${c}22;color:${c}">${s.ticker.slice(0,4)}</div>
+</div>
+<div class="j-company-info">
+<div class="j-company-ticker" style="color:${c}">${s.ticker}</div>
+<div class="j-company-fullname">${s.name}</div>
+<div class="j-company-badge" style="background:${c}15;color:${c}">${subtitle}</div>
+</div>
+</div>
+<div class="j-article-body">
+<div class="j-divider" style="background:${c}"></div>
+<p class="j-text">${body}</p>
+</div>
+</div>`;
 }
-return`<div class="j-section" style="border-left:3px solid ${sec.def.color}"><div class="j-title" style="color:${sec.def.color}">${sec.def.icon} ${sec.title}</div><p class="j-text">${body}</p></div>`;
+
+const c=sec.def.color||'#ff9f0a';
+const tag=sec.def.tag||sec.title;
+const hero=sec.def.hero||heroClass;
+return`<div class="j-article">
+<div class="j-article-hero ${hero}">
+<span class="j-article-tag" style="background:${c}20;color:${c};border:1px solid ${c}40">${tag}</span>
+<div class="j-article-headline">${sec.title}</div>
+<div class="j-article-meta">${date} &nbsp;·&nbsp; Briefing Diario</div>
+</div>
+<div class="j-article-body">
+<div class="j-divider" style="background:${c}"></div>
+<p class="j-text">${body}</p>
+</div>
+</div>`;
 }).join('');
 }
 

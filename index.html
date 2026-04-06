@@ -93,7 +93,29 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',-apple-system,Bl
 .btn-row{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:20px;align-items:center}
 
 /* ── JOURNAL ── */
-.j-subtabs{display:flex;gap:4px;background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:4px;margin-bottom:22px;overflow-x:auto}
+/* ── JOURNAL BLOOMBERG ── */
+.j-article{background:var(--bg2);border:1px solid var(--border);border-radius:20px;overflow:hidden;margin-bottom:20px}
+.j-article-hero{padding:36px 36px 30px;position:relative;display:flex;flex-direction:column;justify-content:flex-end;min-height:160px}
+.j-hero-global{background:linear-gradient(145deg,#050510 0%,#0a102a 55%,#0c1f45 100%)}
+.j-hero-macro{background:linear-gradient(145deg,#120800 0%,#221200 55%,#2a1800 100%)}
+.j-hero-empresas{background:linear-gradient(145deg,#00100a 0%,#001a12 55%,#002a1c 100%)}
+.j-hero-relatorios{background:linear-gradient(145deg,#08001a 0%,#110025 55%,#1a003a 100%)}
+.j-article-tag{font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;padding:5px 12px;border-radius:6px;display:inline-block;margin-bottom:18px;font-family:'Inter',system-ui,sans-serif;width:fit-content}
+.j-article-headline{font-size:26px;font-weight:900;color:#fff;letter-spacing:-0.6px;line-height:1.15;font-family:'Inter',system-ui,sans-serif;margin-bottom:12px}
+.j-article-meta{font-size:11px;color:rgba(255,255,255,.35);font-family:'Inter',system-ui,sans-serif;font-weight:500;letter-spacing:0.5px}
+.j-article-body{padding:30px 36px}
+.j-divider{width:36px;height:3px;border-radius:2px;margin-bottom:24px}
+.j-text{color:rgba(235,235,245,.78);font-size:15px;line-height:1.9;white-space:pre-line;font-family:'Inter',system-ui,sans-serif;font-weight:400}
+.j-company-header{display:flex;align-items:center;gap:20px;padding:24px 30px;background:var(--bg3);border-bottom:1px solid var(--border)}
+.j-company-logo-wrap{position:relative;width:52px;height:52px;flex-shrink:0}
+.j-company-logo{width:52px;height:52px;border-radius:14px;object-fit:contain;background:#fff;padding:5px}
+.j-company-logo-fallback{width:52px;height:52px;border-radius:14px;display:none;align-items:center;justify-content:center;font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:11px}
+.j-company-info{flex:1}
+.j-company-ticker{font-size:22px;font-weight:900;letter-spacing:-0.5px;line-height:1;font-family:'Inter',system-ui,sans-serif}
+.j-company-fullname{font-size:13px;color:var(--muted);margin-top:4px;font-weight:500}
+.j-company-badge{font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;padding:4px 10px;border-radius:5px;margin-top:8px;display:inline-block;font-family:'Inter',system-ui,sans-serif}
+.j-error{background:var(--bg2);border:1px solid #ff453a44;border-radius:20px;padding:28px;margin-bottom:16px}
+
 .j-subtab{border:none;border-radius:10px;padding:10px 16px;font-family:'Inter',system-ui,sans-serif;font-size:12px;font-weight:600;cursor:pointer;color:var(--muted);background:transparent;transition:all .2s;white-space:nowrap;flex:1;text-align:center}
 .j-subtab:not(.active):hover{color:var(--text)}
 .j-subtab.active{font-weight:700}
@@ -102,14 +124,6 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',-apple-system,Bl
 .j-subtab[data-tab="empresas"].active{background:#30d15818;border:1px solid #30d15844;color:#30d158}
 .j-subtab[data-tab="macro"].active{background:#bf5af218;border:1px solid #bf5af244;color:#bf5af2}
 
-.j-section{background:var(--bg2);border:1px solid var(--border);border-radius:20px;padding:28px;margin-bottom:16px}
-.j-section-accent{width:32px;height:3px;border-radius:2px;margin-bottom:20px}
-.j-title{font-size:11px;letter-spacing:2px;text-transform:uppercase;font-weight:700;margin-bottom:18px;font-family:'Inter',system-ui,sans-serif}
-.j-text{color:rgba(235,235,245,.75);font-size:15px;line-height:1.9;white-space:pre-line;font-family:'Inter',system-ui,sans-serif;font-weight:400}
-.j-company{background:var(--bg2);border:1px solid var(--border);border-radius:20px;overflow:hidden;margin-bottom:16px}
-.j-company-head{background:var(--bg3);padding:18px 24px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:16px}
-.j-chip{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:10px;flex-shrink:0}
-.j-company-body{padding:24px}
 
 /* ── OPERATIONS ── */
 .op-form{background:var(--bg2);border:1px solid var(--border);border-radius:20px;padding:28px;max-width:480px;margin-bottom:18px}
